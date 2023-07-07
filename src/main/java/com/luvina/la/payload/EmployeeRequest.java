@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Class khai báo các parameters của employee
+ * @author Toannq
+ */
 public class EmployeeRequest {
     private  String employee_name;
     private  String department_id;

@@ -1,6 +1,7 @@
 package com.luvina.la.controller;
 
 import com.luvina.la.entity.Department;
+import com.luvina.la.payload.DepartmentResponse;
 import com.luvina.la.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,7 @@ import java.util.List;
 public class DepartmentController {
     private final DepartmentService departmentService;
     @GetMapping("")
-    public List<Department> getDepartment(){
+    public DepartmentResponse getDepartment(){
         return  departmentService.getDepartment();
     }
 }

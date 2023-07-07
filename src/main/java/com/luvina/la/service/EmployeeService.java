@@ -11,15 +11,17 @@ import com.luvina.la.payload.EmployeeResponse;
 import java.util.List;
 
 /**
- * Interface chứa các method liên quan đến Employee
+ * Interface chứa các xử lý logic liên quan đến Employee
  * @author Toannq
  */
 public interface EmployeeService {
     /**
-     * Xử lý việc get danh sách employee theo các die
-     * @param employeeRequest
-     * @return
+     * Xử lý việc lấy ra danh sách Employee
+     * @param employeeRequest Danh sách các RequestParams
+     * @param fields danh sách các fields cần sắp xếp
+     * @param directions danh sách các thứ tự sắp xếp
+     * @return EmployeeResponse
      */
     EmployeeResponse getEmployee(EmployeeRequest employeeRequest,List<String> fields,List<String> directions);
-    EmployeeResponse getEmployees(EmployeeRequest employeeRequest);
+
 }

@@ -61,21 +61,7 @@ public class EmployeeController {
                 .build();
         return employeeService.getEmployee(employeeRequest,fields,directions);
     }
-    @GetMapping("/list")
-    public EmployeeResponse listEmployees(@RequestParam(required = false)  String employee_name,@RequestParam(required = false) String department_id,@RequestParam(required = false) String ord_employee_name,
-                                         @RequestParam(required = false) String ord_end_date,@RequestParam String offset,@RequestParam String limit,@RequestParam(required = false) String ord_certification_name){
 
-        EmployeeRequest employeeRequest=EmployeeRequest.builder()
-                .employee_name(employee_name)
-                .department_id(department_id)
-                .ord_employee_name(ord_employee_name)
-                .offset(offset)
-                .limit(limit)
-                .ord_end_date(ord_end_date)
-                .ord_certification_name(ord_certification_name)
-                .build();
-        return employeeService.getEmployees(employeeRequest);
-    }
 
 
 

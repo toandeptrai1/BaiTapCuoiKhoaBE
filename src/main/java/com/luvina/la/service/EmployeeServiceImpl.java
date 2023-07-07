@@ -47,6 +47,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
      *
      * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
+     * @param fields          danh sách các fields cần sắp xếp
+     * @param directions      danh sách các thứ tự sắp xếp
      * @return Trả về 1 EmployeeResponse
      */
     @Override
@@ -92,48 +94,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-    @Override
-    public EmployeeResponse getEmployees(EmployeeRequest employeeRequest) {
-
-        List<Employee> employeeList = employeeRepo.findAll(new Specification<Employee>() {
-            @Override
-            public Predicate toPredicate(Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-                List<Predicate> predicates = new ArrayList<>();
-                if (employeeRequest.getDepartment_id().equals("")) {
-                    employeeRequest.setDepartment_id(null);
-                }
-
-
-                if ((employeeRequest.getEmployee_name() != null && employeeRequest.getEmployee_name().equals(""))
-                        && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
-                ) {
-
-                    predicates.add( criteriaBuilder.equal(root.get("department").get("departmentId"), employeeRequest.getDepartment_id()));
-                }  else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
-                        && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
-                ) {
-                    predicates.add(criteriaBuilder.and(
-                            criteriaBuilder.like(root.get("employeeName"), "%" + employeeRequest.getEmployee_name() + "%"),
-                            criteriaBuilder.equal(root.get("department").get("departmentId"), employeeRequest.getDepartment_id())
-                    ));
-
-                }else {
-                    predicates.add( criteriaBuilder.like(root.get("employeeName"), "%" + employeeRequest.getEmployee_name() + "%"));
-                }
-
-
-
-                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
-            }
-        });
-        List<EmployeeDTO> employeeDTOList = employeeList.stream().map(this::mapToEmpDTO).collect(Collectors.toList());
-
-        return EmployeeResponse.builder()
-                .code(200)
-                .totalRecords(employeeList.size())
-                .employees(employeeDTOList)
-                .build();
-    }
 
     /**
      * Xử lý việc map từ 1 Employee sang EmployeeDTO
@@ -164,6 +124,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return builder.build();
     }
+    /**
+     * Xử lý việc chuyển đổi fields,directions thành các Sort.Order tương ứng
+     *
+     * @param fields     danh sách các fields cần sắp xếp
+     * @param directions danh sách các thứ tự sắp xếp
+     * @return Danh sách Sort.Order
+     */
     public  List<Sort.Order> getSortOrders(String[] fields, String[] directions) {
         List<Sort.Order> sortOrders = new ArrayList<>();
 
