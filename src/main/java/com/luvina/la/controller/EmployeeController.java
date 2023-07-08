@@ -1,5 +1,6 @@
 package com.luvina.la.controller;
 
+import com.luvina.la.exception.OrdValueInvalid;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
 import com.luvina.la.service.EmployeeServiceImpl;
@@ -49,6 +50,18 @@ public class EmployeeController {
                     break;
                 }
             }
+        }
+        if(ord_employee_name==null||(!ord_employee_name.equalsIgnoreCase("asc")&&!ord_employee_name.equalsIgnoreCase("desc"))){
+            throw new OrdValueInvalid("ERR021");
+
+        }
+        if(ord_certification_name==null||(!ord_certification_name.equalsIgnoreCase("asc")&&!ord_certification_name.equalsIgnoreCase("desc"))){
+            throw new OrdValueInvalid("ERR021");
+
+        }
+        if(ord_end_date==null||(!ord_end_date.equalsIgnoreCase("asc")&&!ord_end_date.equalsIgnoreCase("desc"))){
+            throw new OrdValueInvalid("ERR021");
+
         }
         EmployeeRequest employeeRequest=EmployeeRequest.builder()
                 .employee_name(employee_name)
