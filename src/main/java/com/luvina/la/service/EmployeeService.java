@@ -25,6 +25,12 @@ public interface EmployeeService {
      * @return EmployeeResponse
      */
     EmployeeResponse getEmployee(EmployeeRequest employeeRequest,List<String> fields,List<String> directions);
+
+    /**
+     * Thực hiện khai báo 1 phương thức xử lý logic add 1 employee
+     * @param addEmployeeRequest
+     * @return
+     */
     Employee addemployee(AddEmployeeRequest addEmployeeRequest);
 
 }

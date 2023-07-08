@@ -1,5 +1,6 @@
 package com.luvina.la.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ public class Certification {
     @Column(name = "certification_level")
     private Integer certificationLevel;
     @OneToMany(mappedBy = "certification",fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<EmployeeCertification> EmployeeCertification;
 
 

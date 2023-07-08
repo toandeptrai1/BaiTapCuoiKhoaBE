@@ -73,6 +73,12 @@ public class EmployeeController {
         return employeeService.getEmployee(employeeRequest,fields,directions);
     }
 
+    /**
+     * Xử lý gọi lại phương thức add Employee từ EmployeeService
+     * và trả về api
+     * @param employee
+     * @return
+     */
     @PostMapping("/add")
     public ResponseEntity<?> addEmployee(@RequestBody AddEmployeeRequest employee){
         if(employee.getCertifications()==null){

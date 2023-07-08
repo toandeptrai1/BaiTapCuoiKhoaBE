@@ -161,6 +161,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return builder.build();
     }
+
+    /**
+     * Xử lý việc chuyển từ AddEmployeeRequest thành 1 Employee
+     * @param addEmployeeRequest
+     * @param department
+     * @return
+     */
     public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest,Department department){
         return Employee.builder()
                 .employeeName(addEmployeeRequest.getEmployeeName())
@@ -175,6 +182,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+    /**
+     * Xử lý việc chuyển 1 EmployeeCertificationReq thành 1 EmployeeCertification
+     * @param req EmployeeCertificationReq cần chuyển đổi
+     * @param certification certification chứng chỉ tiếng nhật
+     * @param employee
+     * @return
+     */
     public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification certification,Employee employee){
         return EmployeeCertification.builder()
                 .certification(certification)
