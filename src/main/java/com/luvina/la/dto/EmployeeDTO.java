@@ -22,6 +22,7 @@ public class EmployeeDTO implements Serializable {
     private String departmentName;
     private String employeeTelephone;
     private String certificationName;
+
     @JsonFormat(pattern = "yyyy/MM/dd")
     private Date employeeBirthDate;
     @JsonFormat(pattern = "yyyy/MM/dd")

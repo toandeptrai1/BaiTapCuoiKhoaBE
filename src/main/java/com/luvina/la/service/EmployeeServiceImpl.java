@@ -5,13 +5,18 @@
 package com.luvina.la.service;
 
 import com.luvina.la.dto.EmployeeDTO;
+import com.luvina.la.entity.Certification;
 import com.luvina.la.entity.Department;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.entity.EmployeeCertification;
 import com.luvina.la.mapper.EmployeeMapper;
+import com.luvina.la.payload.AddEmployeeRequest;
+import com.luvina.la.payload.EmployeeCertificationReq;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
+import com.luvina.la.repository.CertificationRepository;
 import com.luvina.la.repository.DepartmentRepository;
+import com.luvina.la.repository.EmployeeCertificationRepo;
 import com.luvina.la.repository.EmployeeRepository;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -42,6 +48,8 @@ import java.util.stream.StreamSupport;
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepo;
     private final DepartmentRepository departmentRepo;
+    private final CertificationRepository certificationRepo;
+    private final EmployeeCertificationRepo employeeCertificationRepo;
 
     /**
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
@@ -94,6 +102,35 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+    /**
+     * Xử lý logic cho việc add 1 employee vào bảng employee
+     * @param addEmployeeRequest
+     * @return employee
+     */
+    @Transactional
+    @Override
+    public Employee addemployee(AddEmployeeRequest addEmployeeRequest) {
+        Department department=departmentRepo.findById(addEmployeeRequest.getDepartmentId()).orElseThrow();
+        Employee employee=mapToAddemployeeRequestToEmployee(addEmployeeRequest,department);
+        Employee addEmployee=employeeRepo.save(employee);
+        List<EmployeeCertification> employeeCertificationList=new ArrayList<>();
+
+        if(addEmployeeRequest.getCertifications().size()>0){
+            for (EmployeeCertificationReq e: addEmployeeRequest.getCertifications()) {
+                EmployeeCertification employeeCertification=new EmployeeCertification();
+                Certification certification=new Certification();
+                certification=certificationRepo.findById(e.getCertificationId()).orElseThrow();
+                employeeCertification=mapEmployeeCertificationReqToEmCertificate(e,certification,addEmployee);
+                employeeCertificationList.add(employeeCertification);
+            }
+        }
+        if(employeeCertificationList.size()>0){
+            employeeCertificationList.forEach(employeeCertificationRepo::save);
+        }
+
+        return addEmployee;
+    }
+
 
     /**
      * Xử lý việc map từ 1 Employee sang EmployeeDTO
@@ -123,6 +160,29 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
         return builder.build();
+    }
+    public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest,Department department){
+        return Employee.builder()
+                .employeeName(addEmployeeRequest.getEmployeeName())
+                .employeeId(addEmployeeRequest.getEmployeeId())
+                .employeeTelephone(addEmployeeRequest.getEmployeeTelephone())
+                .employeeEmail(addEmployeeRequest.getEmployeeEmail())
+                .employeeNameKana(addEmployeeRequest.getEmployeeNameKana())
+                .employeeLoginPassword(addEmployeeRequest.getEmployeeLoginPassword())
+                .employeeLoginId(addEmployeeRequest.getEmployeeLoginId())
+                .employeeBirthDate(addEmployeeRequest.getEmployeeBirthDate())
+                .department(department)
+                .build();
+    }
+
+    public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification certification,Employee employee){
+        return EmployeeCertification.builder()
+                .certification(certification)
+                .startDate(req.getCertificationStartDate())
+                .endDate(req.getCertificationEndDate())
+                .score(req.getEmployeeCertificationScore())
+                .employee(employee)
+                .build();
     }
     /**
      * Xử lý việc chuyển đổi fields,directions thành các Sort.Order tương ứng

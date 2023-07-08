@@ -5,6 +5,8 @@
 
 package com.luvina.la.service;
 
+import com.luvina.la.entity.Employee;
+import com.luvina.la.payload.AddEmployeeRequest;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
 
@@ -23,5 +25,6 @@ public interface EmployeeService {
      * @return EmployeeResponse
      */
     EmployeeResponse getEmployee(EmployeeRequest employeeRequest,List<String> fields,List<String> directions);
+    Employee addemployee(AddEmployeeRequest addEmployeeRequest);
 
 }
