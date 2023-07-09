@@ -2,6 +2,7 @@ package com.luvina.la.controller;
 
 import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.OrdValueInvalid;
+import com.luvina.la.exception.PageSizeException;
 import com.luvina.la.payload.AddEmployeeRequest;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
@@ -60,6 +61,23 @@ public class EmployeeController {
         if(ord_end_date==null||(!ord_end_date.equalsIgnoreCase("asc")&&!ord_end_date.equalsIgnoreCase("desc"))){
             throw new OrdValueInvalid("ERR021");
 
+        }
+        try{
+            if(Integer.parseInt(limit)<0){
+                throw new PageSizeException("ERR018-リミット");
+            }
+
+        }catch (NumberFormatException ex){
+            throw new PageSizeException("ERR018-リミット");
+        }
+        try{
+
+            if(Integer.parseInt(offset)<0){
+                throw new PageSizeException("ERR018-オフセット");
+            }
+
+        }catch (NumberFormatException ex){
+            throw new PageSizeException("ERR018-オフセット");
         }
         EmployeeRequest employeeRequest=EmployeeRequest.builder()
                 .employee_name(employee_name)
