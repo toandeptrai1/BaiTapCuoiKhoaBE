@@ -24,32 +24,7 @@ public class EmployeeController {
                                          @RequestParam(required = false) String ord_end_date, @RequestParam String offset, @RequestParam String limit, @RequestParam(required = false) String ord_certification_name
                                          , HttpServletRequest request){
 
-        Enumeration<String> params = request.getParameterNames();
-        List<String> fields=new ArrayList<>();
-        List<String> directions=new ArrayList<>();
-        while (params.hasMoreElements()){
-            String paramName = params.nextElement();
-            String paramSort = request.getParameter(paramName);
 
-            switch (paramName){
-                case "ord_employee_name": {
-                    fields.add("employeeName");
-                    directions.add(paramSort);
-                    break;
-                }
-                case "ord_certification_name": {
-
-                    fields.add("employeeCertification.certification.certificationName");
-                    directions.add(paramSort);
-                    break;
-                }
-                case "ord_end_date": {
-                    fields.add("employeeCertification.endDate");
-                    directions.add(paramSort);
-                    break;
-                }
-            }
-        }
         if(ord_employee_name==null||(!ord_employee_name.equalsIgnoreCase("asc")&&!ord_employee_name.equalsIgnoreCase("desc"))){
             throw new OrdValueInvalid("ERR021");
 
@@ -88,7 +63,7 @@ public class EmployeeController {
                 .ord_end_date(ord_end_date)
                 .ord_certification_name(ord_certification_name)
                 .build();
-        return employeeService.getEmployee(employeeRequest,fields,directions);
+        return employeeService.getEmployee(employeeRequest);
     }
 
     /**

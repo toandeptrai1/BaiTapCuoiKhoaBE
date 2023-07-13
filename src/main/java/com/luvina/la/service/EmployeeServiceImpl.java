@@ -55,17 +55,19 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
      *
      * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
-     * @param fields          danh sách các fields cần sắp xếp
-     * @param directions      danh sách các thứ tự sắp xếp
+
      * @return Trả về 1 EmployeeResponse
      */
     @Override
-    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest,List<String> fields,List<String> directions) {
+    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest) {
         Pageable pageable;
         Page<Employee> list;
+        String[] fields = {"employeeName", "employeeCertification.certification.certificationName", "employeeCertification.endDate"};
+        String[] directions = {employeeRequest.getOrd_employee_name(), employeeRequest.getOrd_certification_name(), employeeRequest.getOrd_end_date()};
 
 
-        List<Sort.Order> sortOrders = getSortOrders(fields.toArray(new String[fields.size()]), directions.toArray(new String[directions.size()]));
+
+        List<Sort.Order> sortOrders = getSortOrders(fields, directions);
         if (!sortOrders.isEmpty()) {
             Sort sort = Sort.by(sortOrders);
             pageable=PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),Integer.parseInt(employeeRequest.getLimit()),sort);
