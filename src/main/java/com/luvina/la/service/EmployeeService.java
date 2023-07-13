@@ -20,11 +20,9 @@ public interface EmployeeService {
     /**
      * Xử lý việc lấy ra danh sách Employee
      * @param employeeRequest Danh sách các RequestParams
-     * @param fields danh sách các fields cần sắp xếp
-     * @param directions danh sách các thứ tự sắp xếp
      * @return EmployeeResponse
      */
-    EmployeeResponse getEmployee(EmployeeRequest employeeRequest,List<String> fields,List<String> directions);
+    EmployeeResponse getEmployee(EmployeeRequest employeeRequest);
 
     /**
      * Thực hiện khai báo 1 phương thức xử lý logic add 1 employee
