@@ -1,3 +1,7 @@
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ * EmployeeController.java, June 29, 2023 Toannq
+ */
 package com.luvina.la.controller;
 
 import com.luvina.la.entity.Employee;
@@ -14,24 +18,30 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+/**
+ * Xử lý việc tạo các đầu api thực hiện các service ở EmployeeServiceImpl
+ *
+ * @author Toannq
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/employee")
 public class EmployeeController {
     private final EmployeeServiceImpl employeeService;
+
     @GetMapping("")
-    public EmployeeResponse listEmployee(@RequestParam(required = false)  String employee_name, @RequestParam(required = false) String department_id, @RequestParam(required = false) String ord_employee_name,
+    public EmployeeResponse listEmployee(@RequestParam(required = false) String employee_name, @RequestParam(required = false) String department_id, @RequestParam(required = false) String ord_employee_name,
                                          @RequestParam(required = false) String ord_end_date, @RequestParam String offset, @RequestParam String limit, @RequestParam(required = false) String ord_certification_name
-                                         , HttpServletRequest request){
+            , HttpServletRequest request) {
 
         Enumeration<String> params = request.getParameterNames();
-        List<String> fields=new ArrayList<>();
-        List<String> directions=new ArrayList<>();
-        while (params.hasMoreElements()){
+        List<String> fields = new ArrayList<>();
+        List<String> directions = new ArrayList<>();
+        while (params.hasMoreElements()) {
             String paramName = params.nextElement();
             String paramSort = request.getParameter(paramName);
 
-            switch (paramName){
+            switch (paramName) {
                 case "ord_employee_name": {
                     fields.add("employeeName");
                     directions.add(paramSort);
@@ -39,7 +49,7 @@ public class EmployeeController {
                 }
                 case "ord_certification_name": {
 
-                    fields.add("employeeCertification.certification.certificationName");
+                    fields.add("employeeCertification.certification.certificationLevel");
                     directions.add(paramSort);
                     break;
                 }
@@ -50,36 +60,36 @@ public class EmployeeController {
                 }
             }
         }
-        if(ord_employee_name==null||(!ord_employee_name.equalsIgnoreCase("asc")&&!ord_employee_name.equalsIgnoreCase("desc"))){
+        if (ord_employee_name == null || (!ord_employee_name.equalsIgnoreCase("asc") && !ord_employee_name.equalsIgnoreCase("desc"))) {
             throw new OrdValueInvalid("ERR021");
 
         }
-        if(ord_certification_name==null||(!ord_certification_name.equalsIgnoreCase("asc")&&!ord_certification_name.equalsIgnoreCase("desc"))){
+        if (ord_certification_name == null || (!ord_certification_name.equalsIgnoreCase("asc") && !ord_certification_name.equalsIgnoreCase("desc"))) {
             throw new OrdValueInvalid("ERR021");
 
         }
-        if(ord_end_date==null||(!ord_end_date.equalsIgnoreCase("asc")&&!ord_end_date.equalsIgnoreCase("desc"))){
+        if (ord_end_date == null || (!ord_end_date.equalsIgnoreCase("asc") && !ord_end_date.equalsIgnoreCase("desc"))) {
             throw new OrdValueInvalid("ERR021");
 
         }
-        try{
-            if(Integer.parseInt(limit)<0){
+        try {
+            if (Integer.parseInt(limit) < 0) {
                 throw new PageSizeException("ERR018-リミット");
             }
 
-        }catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             throw new PageSizeException("ERR018-リミット");
         }
-        try{
+        try {
 
-            if(Integer.parseInt(offset)<0){
+            if (Integer.parseInt(offset) < 0) {
                 throw new PageSizeException("ERR018-オフセット");
             }
 
-        }catch (NumberFormatException ex){
+        } catch (NumberFormatException ex) {
             throw new PageSizeException("ERR018-オフセット");
         }
-        EmployeeRequest employeeRequest=EmployeeRequest.builder()
+        EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .employee_name(employee_name)
                 .department_id(department_id)
                 .ord_employee_name(ord_employee_name)
@@ -88,35 +98,34 @@ public class EmployeeController {
                 .ord_end_date(ord_end_date)
                 .ord_certification_name(ord_certification_name)
                 .build();
-        return employeeService.getEmployee(employeeRequest,fields,directions);
+        return employeeService.getEmployee(employeeRequest, fields, directions);
     }
 
     /**
      * Xử lý gọi lại phương thức add Employee từ EmployeeService
      * và trả về api
+     *
      * @param employee
      * @return
      */
     @PostMapping("/add")
-    public ResponseEntity<?> addEmployee(@RequestBody AddEmployeeRequest employee){
-        if(employee.getCertifications()==null){
+    public ResponseEntity<?> addEmployee(@RequestBody AddEmployeeRequest employee) {
+        if (employee.getCertifications() == null) {
             employee.setCertifications(new ArrayList<>());
         }
-        Employee e= employeeService.addemployee(employee);
-        Map<String,Object> apiResponse=new HashMap<>();
-        apiResponse.put("code",200);
-        apiResponse.put("employeeId",e.getEmployeeId());
-        List<String> params=new ArrayList<>();
-        Map<String,Object> message=new HashMap<>();
-        message.put("code","MSG001");
-        message.put("prams",params);
-        apiResponse.put("message",message);
+        Employee e = employeeService.addemployee(employee);
+        Map<String, Object> apiResponse = new HashMap<>();
+        apiResponse.put("code", 200);
+        apiResponse.put("employeeId", e.getEmployeeId());
+        List<String> params = new ArrayList<>();
+        Map<String, Object> message = new HashMap<>();
+        message.put("code", "MSG001");
+        message.put("prams", params);
+        apiResponse.put("message", message);
 
         return ResponseEntity.ok().body(apiResponse);
 
     }
-
-
 
 
 }
