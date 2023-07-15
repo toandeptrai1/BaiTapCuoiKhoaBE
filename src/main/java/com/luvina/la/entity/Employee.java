@@ -1,17 +1,23 @@
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ *
+ * Employee.java, June 29, 2023 Toannq
+ */
 
 package com.luvina.la.entity;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.*;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * class chứa các thuộc tính của 1 employee
+ * @author Toannq
+ */
 @Entity
 @Table(name = "employees")
 @Data

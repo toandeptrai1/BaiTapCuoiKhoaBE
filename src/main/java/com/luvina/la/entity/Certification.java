@@ -1,11 +1,19 @@
-package com.luvina.la.entity;
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ *
+ * Certification.java, June 29, 2023 Toannq
+ */
 
+package com.luvina.la.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * Class chứa các thuộc tính của 1 certification
+ * @author Toannq
+ */
 @Entity
 @Table(name = "certifications")
 @Data

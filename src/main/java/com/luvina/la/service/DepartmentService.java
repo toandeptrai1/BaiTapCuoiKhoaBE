@@ -23,6 +23,10 @@ import java.util.List;
 public class DepartmentService {
     private final DepartmentRepository departmentRepo;
 
+    /**
+     * lấy ra danh sách Department
+     * @return DepartmentResponse
+     */
     public DepartmentResponse getDepartment() {
         List<Department> list = departmentRepo.findAll();
         return DepartmentResponse.builder()

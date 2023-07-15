@@ -27,7 +27,7 @@ public interface EmployeeService {
     /**
      * Thực hiện khai báo 1 phương thức xử lý logic add 1 employee
      * @param addEmployeeRequest
-     * @return
+     * @return Employee
      */
     Employee addemployee(AddEmployeeRequest addEmployeeRequest);
 

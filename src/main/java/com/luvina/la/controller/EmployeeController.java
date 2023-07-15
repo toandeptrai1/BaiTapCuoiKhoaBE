@@ -1,5 +1,9 @@
-package com.luvina.la.controller;
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ * EmployeeController.java, June 29, 2023 Toannq
+ */
 
+package com.luvina.la.controller;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.OrdValueInvalid;
 import com.luvina.la.exception.PageSizeException;
@@ -10,21 +14,37 @@ import com.luvina.la.service.EmployeeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+/**
+ * Tạo EmployeeController
+ * @author Toannq
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/employee")
 public class EmployeeController {
     private final EmployeeServiceImpl employeeService;
+
+    /**
+     *
+     * @param employee_name employeeName nhận được từ request
+     * @param department_id department_id nhận được từ request
+     * @param ord_employee_name ord_employee_name nhận được từ request
+     * @param ord_end_date ord_end_date nhận được từ request
+     * @param offset offset nhận được từ request
+     * @param limit limit nhận được từ request
+     * @param ord_certification_name ord_certification_name nhận được từ request
+     * @param request
+     * @return listEmployee danh sách Employee
+     */
     @GetMapping("")
     public EmployeeResponse listEmployee(@RequestParam(required = false)  String employee_name, @RequestParam(required = false) String department_id, @RequestParam(required = false) String ord_employee_name,
                                          @RequestParam(required = false) String ord_end_date, @RequestParam String offset, @RequestParam String limit, @RequestParam(required = false) String ord_certification_name
                                          , HttpServletRequest request){
 
-
+        //Xử lý các ngoại lệ
         if(ord_employee_name==null||(!ord_employee_name.equalsIgnoreCase("asc")&&!ord_employee_name.equalsIgnoreCase("desc"))){
             throw new OrdValueInvalid("ERR021");
 

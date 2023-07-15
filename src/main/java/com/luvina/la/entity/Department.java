@@ -1,13 +1,18 @@
-package com.luvina.la.entity;
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ * Department.java, June 29, 2023 Toannq
+ */
 
+package com.luvina.la.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
+/**
+ * Class chứa các thuộc tính của 1 department
+ * @author Toannq
+ */
 @Entity
 @Table(name = "departments")
 @Data

@@ -1,16 +1,20 @@
-package com.luvina.la.payload;
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ * AddEmployeeRequest.java, June 29, 2023 Toannq
+ */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.luvina.la.entity.Certification;
-import com.luvina.la.entity.EmployeeCertification;
+package com.luvina.la.payload;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class chứa danh sách param của api Add Employee
+ * @author Toannq
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,8 +30,5 @@ public class AddEmployeeRequest {
     private Long departmentId;
     private String employeeLoginPassword;
     private List<EmployeeCertificationReq> certifications;
-
-
-
 
 }

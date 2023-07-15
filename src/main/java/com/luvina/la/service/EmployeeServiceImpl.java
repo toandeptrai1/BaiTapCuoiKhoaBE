@@ -9,7 +9,6 @@ import com.luvina.la.entity.Certification;
 import com.luvina.la.entity.Department;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.entity.EmployeeCertification;
-import com.luvina.la.mapper.EmployeeMapper;
 import com.luvina.la.payload.AddEmployeeRequest;
 import com.luvina.la.payload.EmployeeCertificationReq;
 import com.luvina.la.payload.EmployeeRequest;
@@ -18,24 +17,17 @@ import com.luvina.la.repository.CertificationRepository;
 import com.luvina.la.repository.DepartmentRepository;
 import com.luvina.la.repository.EmployeeCertificationRepo;
 import com.luvina.la.repository.EmployeeRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
 
 /**
  * Xử lý gọi lại các phương thức của repository và xử lý phần logic liên quan đến
@@ -168,7 +160,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc chuyển từ AddEmployeeRequest thành 1 Employee
      * @param addEmployeeRequest
      * @param department
-     * @return
+     * @return Employee
      */
     public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest,Department department){
         return Employee.builder()
@@ -188,8 +180,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc chuyển 1 EmployeeCertificationReq thành 1 EmployeeCertification
      * @param req EmployeeCertificationReq cần chuyển đổi
      * @param certification certification chứng chỉ tiếng nhật
-     * @param employee
-     * @return
+     * @param employee employee
+     * @return EmployeeCertification
      */
     public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification certification,Employee employee){
         return EmployeeCertification.builder()

@@ -1,5 +1,9 @@
-package com.luvina.la.payload;
+/**
+ * Copyright(C) 2023 Luvina Software Company
+ * EmployeeRequest.java, June 29, 2023 Toannq
+ */
 
+package com.luvina.la.payload;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
