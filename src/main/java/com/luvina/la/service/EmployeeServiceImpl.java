@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final DepartmentRepository departmentRepo;
     private final CertificationRepository certificationRepo;
     private final EmployeeCertificationRepo employeeCertificationRepo;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
@@ -104,6 +106,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public Employee addemployee(AddEmployeeRequest addEmployeeRequest) {
+        addEmployeeRequest.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest.getEmployeeLoginPassword()));
         Department department=departmentRepo.findById(addEmployeeRequest.getDepartmentId()).orElseThrow();
         Employee employee=mapToAddemployeeRequestToEmployee(addEmployeeRequest,department);
         Employee addEmployee=employeeRepo.save(employee);
