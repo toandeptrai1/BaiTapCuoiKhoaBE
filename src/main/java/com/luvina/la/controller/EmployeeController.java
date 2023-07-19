@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.*;
 
 /**
@@ -94,6 +95,7 @@ public class EmployeeController {
      */
     @PostMapping("/add")
     public ResponseEntity<?> addEmployee(@RequestBody AddEmployeeRequest employee){
+
         if(employee.getCertifications()==null){
             employee.setCertifications(new ArrayList<>());
         }

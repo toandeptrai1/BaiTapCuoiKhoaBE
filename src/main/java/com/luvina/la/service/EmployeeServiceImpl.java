@@ -9,6 +9,7 @@ import com.luvina.la.entity.Certification;
 import com.luvina.la.entity.Department;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.entity.EmployeeCertification;
+import com.luvina.la.exception.EmployeeAddException;
 import com.luvina.la.payload.AddEmployeeRequest;
 import com.luvina.la.payload.EmployeeCertificationReq;
 import com.luvina.la.payload.EmployeeRequest;
@@ -106,8 +107,69 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public Employee addemployee(AddEmployeeRequest addEmployeeRequest) {
+        //Throw exception nếu EmployeeLoginId không hợp lệ
+        if(addEmployeeRequest == null){
+            throw new EmployeeAddException("ER001-アカウント名");
+        } else if (addEmployeeRequest.getEmployeeLoginId().length()>50) {
+            throw new EmployeeAddException("ER006-アカウント名");
+        }else if(!addEmployeeRequest.getEmployeeLoginId().matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
+            throw new EmployeeAddException("ER019-アカウント名");
+        }else if (employeeRepo.findByEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId()).isPresent()){
+            throw new EmployeeAddException("ER003-アカウント名");
+        }
+
+        //Throw exception nếu employeeName không hợp lệ
+        if(addEmployeeRequest.getEmployeeName()==null ||addEmployeeRequest.getEmployeeName().equals("")){
+            throw new EmployeeAddException("ER001-氏名");
+        } else if (addEmployeeRequest.getEmployeeName().length()>125) {
+            throw new EmployeeAddException("ER006-氏名");
+        }
+
+        //Throw exception nếu employeeNameKana không hợp lệ
+        if(addEmployeeRequest.getEmployeeNameKana()==null ||addEmployeeRequest.getEmployeeNameKana().equals("")){
+            throw new EmployeeAddException("ER001-カタカナ氏名");
+        } else if (addEmployeeRequest.getEmployeeNameKana().length()>125) {
+            throw new EmployeeAddException("ER006-カタカナ氏名");
+        } else if (!addEmployeeRequest.getEmployeeNameKana().matches("[ぁ-んァ-ン一-龯々〆〤ー・｜｡-ﾟ]+")) {
+            throw new EmployeeAddException("ER009-カタカナ氏名");
+        }
+
+        //Throw exception nếu employeeBirthDate không hợp lệ
+        if(addEmployeeRequest.getEmployeeBirthDate()==null ||addEmployeeRequest.getEmployeeBirthDate().equals("")){
+            throw new EmployeeAddException("ER001-カタカナ氏名");
+        }
+
+        //Throw exception nếu employeeEmail không hợp lệ
+        if(addEmployeeRequest.getEmployeeEmail()==null ||addEmployeeRequest.getEmployeeEmail().equals("")){
+            throw new EmployeeAddException("ER001-メールアドレス");
+        } else if (addEmployeeRequest.getEmployeeEmail().length()>125) {
+            throw new EmployeeAddException("ER006-メールアドレス");
+        }
+        //Throw exception nếu employeeTelephone không hợp lệ
+        if(addEmployeeRequest.getEmployeeTelephone()==null ||addEmployeeRequest.getEmployeeTelephone().equals("")){
+            throw new EmployeeAddException("ER001-電話番号");
+        } else if (addEmployeeRequest.getEmployeeTelephone().length()>50) {
+            throw new EmployeeAddException("ER006-電話番号");
+        } else if (!addEmployeeRequest.getEmployeeTelephone().matches("[a-zA-Z0-9!-/:-@\\\\\\[-`{-~]+")) {
+            throw new EmployeeAddException("ER008-電話番号");
+        }
+
+        //Throw exception nếu employeeLoginPassword không hợp lệ
+        if(addEmployeeRequest.getEmployeeLoginPassword()==null ||addEmployeeRequest.getEmployeeLoginPassword().equals("")){
+            throw new EmployeeAddException("ER001-パスワード");
+        } else if (addEmployeeRequest.getEmployeeLoginPassword().length()>50||addEmployeeRequest.getEmployeeLoginPassword().length()<8) {
+            throw new EmployeeAddException("ER007-パスワード");
+        }
+        //Throw exception nếu departmentId không hợp lệ
+        if(addEmployeeRequest.getDepartmentId()==null){
+            throw new EmployeeAddException("ER002-グループ");
+        } else if (addEmployeeRequest.getDepartmentId()<=0) {
+            throw new EmployeeAddException("ER0018-グループ");
+        }
+
+
         addEmployeeRequest.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest.getEmployeeLoginPassword()));
-        Department department=departmentRepo.findById(addEmployeeRequest.getDepartmentId()).orElseThrow();
+        Department department=departmentRepo.findById(addEmployeeRequest.getDepartmentId()).orElseThrow(()->new EmployeeAddException("ER004-グループ"));
         Employee employee=mapToAddemployeeRequestToEmployee(addEmployeeRequest,department);
         Employee addEmployee=employeeRepo.save(employee);
         List<EmployeeCertification> employeeCertificationList=new ArrayList<>();
@@ -225,5 +287,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return sortOrders;
     }
+
 
 }
