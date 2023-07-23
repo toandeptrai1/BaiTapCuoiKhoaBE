@@ -29,9 +29,9 @@ public class AddEmployeeRequest {
     private String employeeEmail;
     private String employeeLoginId;
     private String employeeTelephone;
-    private Date employeeBirthDate;
+    private String employeeBirthDate;
     private String employeeNameKana;
-    private Long departmentId;
+    private String departmentId;
     private String employeeLoginPassword;
     private List<EmployeeCertificationReq> certifications;
 

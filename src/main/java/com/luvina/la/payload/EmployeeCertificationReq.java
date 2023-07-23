@@ -20,7 +20,7 @@ import java.util.Date;
 @Builder
 public class EmployeeCertificationReq {
     private Long certificationId;
-    private Date certificationStartDate;
-    private Date certificationEndDate;
-    private Float employeeCertificationScore;
+    private String certificationStartDate;
+    private String certificationEndDate;
+    private Long employeeCertificationScore;
 }

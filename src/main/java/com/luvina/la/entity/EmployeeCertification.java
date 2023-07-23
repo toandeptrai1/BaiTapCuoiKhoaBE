@@ -38,6 +38,6 @@ public class EmployeeCertification {
     @Column(name="end_date")
     private Date endDate;
     @Column(name = "score")
-    private Float score;
+    private Long score;
 
 }

@@ -27,5 +27,5 @@ public class EmployeeDTO implements Serializable {
     private Date employeeBirthDate;
     @JsonFormat(pattern = "yyyy/MM/dd")
     private Date endDate;
-    private Float score;
+    private Long score;
 }

@@ -40,7 +40,7 @@ public class ApplicationExceptionHandler {
         if(ex.getMessage().contains("-")){
             String arr[]=ex.getMessage().split("-");
             msg.put("code",arr[0]);
-            msg.put("params",arr[1]);
+            msg.put("params",List.of(arr[1]));
 
         }else{
             msg.put("code",ex.getMessage());
@@ -64,7 +64,7 @@ public class ApplicationExceptionHandler {
         if(ex.getMessage().contains("-")){
             String arr[]=ex.getMessage().split("-");
             msg.put("code",arr[0]);
-            msg.put("params",arr[1]);
+            msg.put("params",List.of(arr[1]));
 
         }else{
             msg.put("code",ex.getMessage());
@@ -88,8 +88,17 @@ public class ApplicationExceptionHandler {
         Map<String, Object> msg=new HashMap<>();
         if(ex.getMessage().contains("-")){
             String arr[]=ex.getMessage().split("-");
-            msg.put("code",arr[0]);
-            msg.put("params",arr[1]);
+            if(ex.getMessage().contains("ER007-パスワード")){
+                msg.put("code",arr[0]);
+                msg.put("params",List.of(arr[1],Integer.parseInt(arr[2]),Integer.parseInt(arr[3])));
+            } else if (ex.getMessage().contains("ER005-資格交付日")||ex.getMessage().contains("ER005-失効日")) {
+                msg.put("code",arr[0]);
+                msg.put("params",List.of(arr[1],arr[2]));
+            } else{
+                msg.put("code",arr[0]);
+                msg.put("params",List.of(arr[1]));
+            }
+
 
         }else{
             msg.put("code",ex.getMessage());
@@ -119,12 +128,23 @@ public class ApplicationExceptionHandler {
         Map<String, Object> msg=new HashMap<>();
         if(fieldName.equals("employeeBirthDate")){
             msg.put("code","ER011");
-            msg.put("params","生年月日");
+            msg.put("params",List.of("生年月日"));
 
         } else if (fieldName.equals("departmentId")) {
-            msg.put("code","ER0018");
-            msg.put("params","グループ");
-        } else  {
+            msg.put("code","ER018");
+            msg.put("params",List.of("グループ"));
+        }else if (fieldName.equals("certifications")) {
+            String errMs=errorMessage.substring(endIndex+2);
+            int start = errMs.indexOf("[\"") + 2;
+            int end = errMs.indexOf("\"]", start);
+            String param="";
+            String fieldNameChild=errMs.substring(start,end);
+            if(fieldNameChild.equals("certificationStartDate")){
+                param="資格交付日";
+            }
+            msg.put("code","ER011");
+            msg.put("params",List.of(param));
+        }  else  {
             msg.put("code",fieldName);
             msg.put("params",List.of());
         }

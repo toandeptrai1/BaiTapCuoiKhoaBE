@@ -26,8 +26,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.crypto.ExemptionMechanismException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 
@@ -158,18 +164,41 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(addEmployeeRequest.getEmployeeLoginPassword()==null ||addEmployeeRequest.getEmployeeLoginPassword().equals("")){
             throw new EmployeeAddException("ER001-パスワード");
         } else if (addEmployeeRequest.getEmployeeLoginPassword().length()>50||addEmployeeRequest.getEmployeeLoginPassword().length()<8) {
-            throw new EmployeeAddException("ER007-パスワード");
+            throw new EmployeeAddException("ER007-パスワード-8-50");
         }
         //Throw exception nếu departmentId không hợp lệ
+
         if(addEmployeeRequest.getDepartmentId()==null){
             throw new EmployeeAddException("ER002-グループ");
-        } else if (addEmployeeRequest.getDepartmentId()<=0) {
+        }
+        Long departId;
+        try{
+            departId=Long.parseLong(addEmployeeRequest.getDepartmentId());
+        }catch (NumberFormatException ex){
             throw new EmployeeAddException("ER0018-グループ");
+        }
+        if (departId<=0) {
+            throw new EmployeeAddException("ER0018-グループ");
+        }
+
+        //Throw exception nếu Certifications không hợp lệ
+        if(addEmployeeRequest.getCertifications().size()>0){
+           addEmployeeRequest.getCertifications().forEach(cer->{
+               if(cer.getCertificationStartDate()==null||cer.getCertificationStartDate().equals("")){
+                   throw new EmployeeAddException("ER001-資格交付日");
+               }
+               if(cer.getCertificationEndDate()==null||cer.getCertificationEndDate().equals("")){
+                   throw new EmployeeAddException("ER001-失効日");
+               }
+
+
+
+           });
         }
 
 
         addEmployeeRequest.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest.getEmployeeLoginPassword()));
-        Department department=departmentRepo.findById(addEmployeeRequest.getDepartmentId()).orElseThrow(()->new EmployeeAddException("ER004-グループ"));
+        Department department=departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId())).orElseThrow(()->new EmployeeAddException("ER004-グループ"));
         Employee employee=mapToAddemployeeRequestToEmployee(addEmployeeRequest,department);
         Employee addEmployee=employeeRepo.save(employee);
         List<EmployeeCertification> employeeCertificationList=new ArrayList<>();
@@ -227,7 +256,16 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param department
      * @return Employee
      */
-    public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest,Department department){
+    public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest,Department department) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        Date employeeBirdthDate;
+        try {
+            employeeBirdthDate = sdf.parse(addEmployeeRequest.getEmployeeBirthDate());
+        } catch (ParseException e) {
+            throw new EmployeeAddException("ER011-生年月日");
+        }
         return Employee.builder()
                 .employeeName(addEmployeeRequest.getEmployeeName())
                 .employeeId(addEmployeeRequest.getEmployeeId())
@@ -236,7 +274,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeNameKana(addEmployeeRequest.getEmployeeNameKana())
                 .employeeLoginPassword(addEmployeeRequest.getEmployeeLoginPassword())
                 .employeeLoginId(addEmployeeRequest.getEmployeeLoginId())
-                .employeeBirthDate(addEmployeeRequest.getEmployeeBirthDate())
+                .employeeBirthDate(employeeBirdthDate)
                 .department(department)
                 .build();
     }
@@ -248,11 +286,31 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employee employee
      * @return EmployeeCertification
      */
-    public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification certification,Employee employee){
+    public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification certification,Employee employee) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        Date endDate;
+        Date startDate;
+        try {
+            startDate = sdf.parse(req.getCertificationStartDate());
+        } catch (ParseException e) {
+            throw new EmployeeAddException("ER005-資格交付日-yyyy/MM/dd");
+        }
+        try {
+            endDate = sdf.parse(req.getCertificationStartDate());
+            if(endDate.before(startDate)||endDate.equals(startDate)){
+                throw new EmployeeAddException("ER012");
+            }
+        } catch (ParseException e) {
+            throw new EmployeeAddException("ER005-失効日-yyyy/MM/dd");
+
+        }
+
         return EmployeeCertification.builder()
                 .certification(certification)
-                .startDate(req.getCertificationStartDate())
-                .endDate(req.getCertificationEndDate())
+                .startDate(startDate)
+                .endDate(endDate)
                 .score(req.getEmployeeCertificationScore())
                 .employee(employee)
                 .build();
