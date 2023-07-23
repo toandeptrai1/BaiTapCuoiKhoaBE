@@ -19,8 +19,8 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class EmployeeCertificationReq {
-    private Long certificationId;
+    private String certificationId;
     private String certificationStartDate;
     private String certificationEndDate;
-    private Long employeeCertificationScore;
+    private String employeeCertificationScore;
 }
