@@ -27,12 +27,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -152,10 +154,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         sdf.setLenient(false);
         Date employeeBirdthDate;
+
+        if(!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())){
+            throw new EmployeeAddException("ER011-生年月日");
+        }
         try {
             employeeBirdthDate = sdf.parse(addEmployeeRequest.getEmployeeBirthDate());
         } catch (ParseException e) {
-            throw new EmployeeAddException("ER011-生年月日");
+            throw new EmployeeAddException("ER005-生年月日-yyyy/MM/dd");
         }
 
 
@@ -206,6 +212,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
                 Date endDate;
                 Date startDate;
+                if(!checkDateValid(cer.getCertificationStartDate())){
+                    throw new EmployeeAddException("ER011-資格交付日");
+                }
                 try {
                     startDate = sdf.parse(cer.getCertificationStartDate());
                 } catch (ParseException e) {
@@ -214,6 +223,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 ///Throw exception nếu CertificationEndDate không hợp lệ
                 if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
                     throw new EmployeeAddException("ER001-失効日");
+                }
+                if(!checkDateValid(cer.getCertificationEndDate())){
+                    throw new EmployeeAddException("ER011-失効日");
                 }
                 try {
                     endDate = sdf.parse(cer.getCertificationEndDate());
@@ -413,6 +425,25 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return sortOrders;
+    }
+    public Boolean checkDateValid(String dateInput){
+        String[] dateFormats = {"dd/MM/yyyy", "yyyy/MM/dd", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy-MM-dd", "MM-dd-yyyy"};
+        Date date = null;
+        boolean validFormat = false;
+
+        // Lặp qua từng định dạng trong mảng
+        for (String format : dateFormats) {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+            sdf.setLenient(false);
+            try {
+                date = sdf.parse(dateInput);
+                validFormat = true;
+                break; // Thoát khỏi vòng lặp khi tìm thấy định dạng phù hợp
+            } catch (ParseException e) {
+                // Không làm gì cả, tiếp tục kiểm tra với định dạng khác trong mảng
+            }
+        }
+        return validFormat;
     }
 
 

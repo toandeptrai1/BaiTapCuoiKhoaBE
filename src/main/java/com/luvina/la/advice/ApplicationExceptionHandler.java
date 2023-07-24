@@ -87,7 +87,8 @@ public class ApplicationExceptionHandler {
             if(ex.getMessage().contains("ER007-パスワード")){
                 msg.put("code",arr[0]);
                 msg.put("params",List.of(arr[1],Integer.parseInt(arr[2]),Integer.parseInt(arr[3])));
-            } else if (ex.getMessage().contains("ER005-資格交付日")||ex.getMessage().contains("ER005-失効日")) {
+            } else if (ex.getMessage().contains("ER005-資格交付日")||ex.getMessage().contains("ER005-失効日")
+                    ||ex.getMessage().contains("ER005-生年月日")) {
                 msg.put("code",arr[0]);
                 msg.put("params",List.of(arr[1],arr[2]));
             } else{
