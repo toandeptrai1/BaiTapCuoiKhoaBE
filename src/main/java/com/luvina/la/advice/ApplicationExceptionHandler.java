@@ -108,47 +108,6 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    /**
-     * Xử lý ngoại lệ về ép kiểu JSON
-     * @param ex Đối tượng thông tin vè lỗi
-     * @param request request
-     * @return ErrorResponse đối tượng chứa thông tin về lỗi
-     */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleDateException(HttpMessageNotReadableException ex, WebRequest request){
-        String errorMessage=ex.getMessage();
-        int startIndex = errorMessage.indexOf("[\"") + 2;
-        int endIndex = errorMessage.indexOf("\"]", startIndex);
-
-        // Lấy chuỗi trường từ thông báo lỗi
-        String fieldName = errorMessage.substring(startIndex, endIndex);
-        Map<String, Object> msg=new HashMap<>();
-        if(fieldName.equals("employeeBirthDate")){
-            msg.put("code","ER011");
-            msg.put("params",List.of("生年月日"));
-
-        } else if (fieldName.equals("departmentId")) {
-            msg.put("code","ER018");
-            msg.put("params",List.of("グループ"));
-        }else if (fieldName.equals("certifications")) {
-            String errMs=errorMessage.substring(endIndex+2);
-            int start = errMs.indexOf("[\"") + 2;
-            int end = errMs.indexOf("\"]", start);
-            String param="";
-            String fieldNameChild=errMs.substring(start,end);
-            if(fieldNameChild.equals("certificationStartDate")){
-                param="資格交付日";
-            }
-            msg.put("code","ER011");
-            msg.put("params",List.of(param));
-        }  else  {
-            msg.put("code",fieldName);
-            msg.put("params",List.of());
-        }
-        ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
-
-        return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
 
 

@@ -27,13 +27,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -426,6 +422,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return sortOrders;
     }
+
+    /**
+     * Phương thức kiểm tra ngày có hợp lệ không
+     * @param dateInput chuỗi date đầu vào
+     * @return boolean
+     */
     public Boolean checkDateValid(String dateInput){
         String[] dateFormats = {"dd/MM/yyyy", "yyyy/MM/dd", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy-MM-dd", "MM-dd-yyyy"};
         Date date = null;
