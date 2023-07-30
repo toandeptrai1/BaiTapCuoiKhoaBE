@@ -5,10 +5,12 @@
 
 package com.luvina.la.controller;
 
+import com.luvina.la.dto.EmployeeCertificationDTO;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.OrdValueInvalid;
 import com.luvina.la.exception.PageSizeException;
 import com.luvina.la.payload.AddEmployeeRequest;
+import com.luvina.la.payload.EmployeeGetByIDResponse;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
 import com.luvina.la.service.EmployeeServiceImpl;
@@ -46,7 +48,7 @@ public class EmployeeController {
                                          @RequestParam(required = false) String department_id,
                                          @RequestParam(required = false) String ord_employee_name,
                                          @RequestParam(required = false) String ord_end_date,
-                                         @RequestParam String offset, @RequestParam String limit,
+                                         @RequestParam(required = false) String offset, @RequestParam(required = false) String limit,
                                          @RequestParam(required = false) String ord_certification_name
             , HttpServletRequest request) {
 
@@ -120,6 +122,10 @@ public class EmployeeController {
 
         return ResponseEntity.ok().body(apiResponse);
 
+    }
+    @GetMapping("/getEmployee/{employeeId}")
+    public ResponseEntity<EmployeeGetByIDResponse> getEmployee(@PathVariable Long employeeId){
+        return ResponseEntity.ok().body(employeeService.getEmployeeById(employeeId));
     }
 
 

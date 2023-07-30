@@ -7,6 +7,7 @@ package com.luvina.la.service;
 
 import com.luvina.la.entity.Employee;
 import com.luvina.la.payload.AddEmployeeRequest;
+import com.luvina.la.payload.EmployeeGetByIDResponse;
 import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
 
@@ -30,5 +31,7 @@ public interface EmployeeService {
      * @return Employee
      */
     Employee addemployee(AddEmployeeRequest addEmployeeRequest);
+
+    EmployeeGetByIDResponse getEmployeeById(Long employeeId);
 
 }

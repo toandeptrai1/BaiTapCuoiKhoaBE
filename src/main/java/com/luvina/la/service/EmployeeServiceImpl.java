@@ -4,16 +4,14 @@
  */
 package com.luvina.la.service;
 
+import com.luvina.la.dto.EmployeeCertificationDTO;
 import com.luvina.la.dto.EmployeeDTO;
 import com.luvina.la.entity.Certification;
 import com.luvina.la.entity.Department;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.entity.EmployeeCertification;
 import com.luvina.la.exception.EmployeeAddException;
-import com.luvina.la.payload.AddEmployeeRequest;
-import com.luvina.la.payload.EmployeeCertificationReq;
-import com.luvina.la.payload.EmployeeRequest;
-import com.luvina.la.payload.EmployeeResponse;
+import com.luvina.la.payload.*;
 import com.luvina.la.repository.CertificationRepository;
 import com.luvina.la.repository.DepartmentRepository;
 import com.luvina.la.repository.EmployeeCertificationRepo;
@@ -291,6 +289,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         return addEmployee;
     }
 
+    @Override
+    public EmployeeGetByIDResponse getEmployeeById(Long employeeId) {
+
+        Employee employee=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->
+                new EmployeeAddException("ER013-ID"));
+        EmployeeGetByIDResponse employeeGetByIDResponse=EmployeeGetByIDResponse.builder()
+                .code(200L)
+                .employeeId(employee.getEmployeeId())
+                .employeeName(employee.getEmployeeName())
+                .employeeTelephone(employee.getEmployeeTelephone())
+                .employeeEmail(employee.getEmployeeEmail())
+                .employeeBirthDate(employee.getEmployeeBirthDate())
+                .employeeLoginId(employee.getEmployeeLoginId())
+                .employeeNameKana(employee.getEmployeeNameKana())
+                .departmentId(employee.getDepartment().getDepartmentId())
+                .departmentName(employee.getDepartment().getDepartmentName())
+                .build();
+        if(employee.getEmployeeCertification().size()>0){
+            employeeGetByIDResponse.setCertifications(employee.getEmployeeCertification().stream()
+                    .map(this::mapToEmployeeCertificationDTO).collect(Collectors.toList()));
+        }else {
+            employeeGetByIDResponse.setCertifications(List.of());
+        }
+        return employeeGetByIDResponse;
+    }
+
 
     /**
      * Xử lý việc map từ 1 Employee sang EmployeeDTO
@@ -446,6 +470,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
         return validFormat;
+    }
+    public EmployeeCertificationDTO mapToEmployeeCertificationDTO(EmployeeCertification employeeCertification){
+
+        return EmployeeCertificationDTO.builder()
+                .certificationId(employeeCertification.getEmployeeCertificationId())
+                .certificationStartDate(employeeCertification.getStartDate())
+                .certificationEndDate(employeeCertification.getEndDate())
+                .employeeCertificationScore(employeeCertification.getScore())
+                .build();
     }
 
 
