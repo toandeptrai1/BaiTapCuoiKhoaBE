@@ -44,12 +44,12 @@ public class EmployeeController {
      * @return listEmployee danh sách Employee
      */
     @GetMapping("")
-    public EmployeeResponse listEmployee(@RequestParam(required = false) String employee_name,
+    public EmployeeResponse listEmployee(@RequestParam(required = false,defaultValue = "") String employee_name,
                                          @RequestParam(required = false) String department_id,
-                                         @RequestParam(required = false) String ord_employee_name,
-                                         @RequestParam(required = false) String ord_end_date,
-                                         @RequestParam(required = false) String offset, @RequestParam(required = false) String limit,
-                                         @RequestParam(required = false) String ord_certification_name
+                                         @RequestParam(required = false,defaultValue = "ASC") String ord_employee_name,
+                                         @RequestParam(required = false,defaultValue = "ASC") String ord_end_date,
+                                         @RequestParam(required = false,defaultValue = "0") String offset, @RequestParam(required = false,defaultValue = "5") String limit,
+                                         @RequestParam(required = false,defaultValue = "ASC") String ord_certification_name
             , HttpServletRequest request) {
 
         //Xử lý các ngoại lệ
@@ -100,8 +100,7 @@ public class EmployeeController {
     /**
      * Xử lý gọi lại phương thức add Employee từ EmployeeService
      * và trả về api
-     *
-     * @param employee
+     * @param employee Dữ liệu của employee cần thêm
      * @return
      */
     @PostMapping("/add")
@@ -123,7 +122,14 @@ public class EmployeeController {
         return ResponseEntity.ok().body(apiResponse);
 
     }
-    @GetMapping("/getEmployee/{employeeId}")
+
+    /**
+     * Xử lý việc gọi phương thức getEmployeeById từ service và
+     * trả về api Employee vừa tìm được
+     * @param employeeId employeeId cần tìm
+     * @return api chứa thông tin employee vùa tìm được
+     */
+    @GetMapping("/{employeeId}")
     public ResponseEntity<EmployeeGetByIDResponse> getEmployee(@PathVariable Long employeeId){
         return ResponseEntity.ok().body(employeeService.getEmployeeById(employeeId));
     }

@@ -109,8 +109,14 @@ public class ApplicationExceptionHandler {
 
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById
+     * @param ex Đối tượng error
+     * @return api chứa thông tin lỗi
+     */
     @ExceptionHandler(MissingPathVariableException.class)
-    public ResponseEntity<ErrorResponse> handleGetEmployeeException(MissingPathVariableException ex, WebRequest request){
+    public ResponseEntity<ErrorResponse> handleGetEmployeeException(MissingPathVariableException ex){
 
         Map<String, Object> msg=new HashMap<>();
 
@@ -119,12 +125,17 @@ public class ApplicationExceptionHandler {
         ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    /**
+     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById
+     * @param ex Đối tượng error
+     * @return api chứa thông tin lỗi
+     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleGetEmployeeException(MethodArgumentTypeMismatchException ex, WebRequest request){
+    public ResponseEntity<ErrorResponse> handleGetEmployeeException(MethodArgumentTypeMismatchException ex){
 
         Map<String, Object> msg=new HashMap<>();
 
-        msg.put("code","ER001");
+        msg.put("code","ER013");
         msg.put("params",List.of("ID"));
         ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);

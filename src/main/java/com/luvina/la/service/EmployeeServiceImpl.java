@@ -97,6 +97,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         List<EmployeeDTO> employeeDTOList = list.stream().map(this::mapToEmpDTO).collect(Collectors.toList());
 
+
         return EmployeeResponse.builder()
                 .code(200)
                 .totalRecords((int) list.getTotalElements())
@@ -149,7 +150,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         sdf.setLenient(false);
         Date employeeBirdthDate;
 
-        if(!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())){
+        if (!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())) {
             throw new EmployeeAddException("ER011-生年月日");
         }
         try {
@@ -206,7 +207,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
                 Date endDate;
                 Date startDate;
-                if(!checkDateValid(cer.getCertificationStartDate())){
+                if (!checkDateValid(cer.getCertificationStartDate())) {
                     throw new EmployeeAddException("ER011-資格交付日");
                 }
                 try {
@@ -218,7 +219,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
                     throw new EmployeeAddException("ER001-失効日");
                 }
-                if(!checkDateValid(cer.getCertificationEndDate())){
+                if (!checkDateValid(cer.getCertificationEndDate())) {
                     throw new EmployeeAddException("ER011-失効日");
                 }
                 try {
@@ -289,12 +290,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         return addEmployee;
     }
 
+    /**
+     * Xử lý việc get EmployeeById
+     *
+     * @param employeeId employeeId cần tìm
+     * @return EmployeeGetByIDResponse chứa thông tin employee tìm dược
+     */
     @Override
     public EmployeeGetByIDResponse getEmployeeById(Long employeeId) {
-
-        Employee employee=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->
+        //Get employee từ db nếu không có sẽ throw 1 exception
+        Employee employee = employeeRepo.findByEmployeeId(employeeId).orElseThrow(() ->
                 new EmployeeAddException("ER013-ID"));
-        EmployeeGetByIDResponse employeeGetByIDResponse=EmployeeGetByIDResponse.builder()
+        EmployeeGetByIDResponse employeeGetByIDResponse = EmployeeGetByIDResponse.builder()
                 .code(200L)
                 .employeeId(employee.getEmployeeId())
                 .employeeName(employee.getEmployeeName())
@@ -306,10 +313,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .departmentId(employee.getDepartment().getDepartmentId())
                 .departmentName(employee.getDepartment().getDepartmentName())
                 .build();
-        if(employee.getEmployeeCertification().size()>0){
+        //Kiểm tra xem có certification không
+        if (employee.getEmployeeCertification().size() > 0) {
             employeeGetByIDResponse.setCertifications(employee.getEmployeeCertification().stream()
-                    .map(this::mapToEmployeeCertificationDTO).collect(Collectors.toList()));
-        }else {
+                    .map(this::mapToEmployeeCertificationDTO).sorted(Comparator.comparingLong(EmployeeCertificationDTO
+                            ::getCertificationId)).collect(Collectors.toList()));
+        } else {
             employeeGetByIDResponse.setCertifications(List.of());
         }
         return employeeGetByIDResponse;
@@ -449,10 +458,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * Phương thức kiểm tra ngày có hợp lệ không
+     *
      * @param dateInput chuỗi date đầu vào
      * @return boolean
      */
-    public Boolean checkDateValid(String dateInput){
+    public Boolean checkDateValid(String dateInput) {
         String[] dateFormats = {"dd/MM/yyyy", "yyyy/MM/dd", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy-MM-dd", "MM-dd-yyyy"};
         Date date = null;
         boolean validFormat = false;
@@ -471,13 +481,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return validFormat;
     }
-    public EmployeeCertificationDTO mapToEmployeeCertificationDTO(EmployeeCertification employeeCertification){
+
+    /**
+     * Xử lý việc map từ 1 EmployeeCertification về 1 EmployeeCertificationDTO
+     *
+     * @param employeeCertification Dữ liệu EmployeeCertification cần chuyển
+     * @return EmployeeCertificationDTO
+     */
+    public EmployeeCertificationDTO mapToEmployeeCertificationDTO(EmployeeCertification employeeCertification) {
 
         return EmployeeCertificationDTO.builder()
-                .certificationId(employeeCertification.getEmployeeCertificationId())
+                .certificationId(employeeCertification.getCertification().getCertificationId())
                 .certificationStartDate(employeeCertification.getStartDate())
                 .certificationEndDate(employeeCertification.getEndDate())
                 .employeeCertificationScore(employeeCertification.getScore())
+                .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
 

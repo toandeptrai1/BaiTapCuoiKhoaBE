@@ -32,6 +32,11 @@ public interface EmployeeService {
      */
     Employee addemployee(AddEmployeeRequest addEmployeeRequest);
 
+    /**
+     * Thực hiên khai báo 1 phương thức getEmployeeByID
+     * @param employeeId employeeId cần tìm
+     * @return EmployeeGetByIDResponse
+     */
     EmployeeGetByIDResponse getEmployeeById(Long employeeId);
 
 }

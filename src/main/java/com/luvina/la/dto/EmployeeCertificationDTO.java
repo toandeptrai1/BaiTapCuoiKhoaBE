@@ -1,3 +1,7 @@
+/*
+ * Copyright(C) 2023 Luvina Software Company
+ * EmployeeCertificationDTO.java, July 30, 2023 Toannq
+ */
 package com.luvina.la.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -8,6 +12,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * Class chứa các thông tin của 1 EmployeeCertificationDTO
+ * @author ToanNQ
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,5 +27,6 @@ public class EmployeeCertificationDTO {
     @JsonFormat(pattern = "yyyy/MM/dd")
     private Date certificationEndDate;
     private Long employeeCertificationScore;
+    private String certificationName;
 
 }
