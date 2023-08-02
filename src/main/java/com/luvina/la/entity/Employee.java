@@ -50,10 +50,10 @@ public class Employee implements Serializable {
     private Date employeeBirthDate;
     @Column(name="employee_telephone")
     private String employeeTelephone;
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id",referencedColumnName = "department_id")
     private Department department;
-    @OneToMany(mappedBy = "employee",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "employee",fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
     private List<EmployeeCertification> employeeCertification;
 
 
