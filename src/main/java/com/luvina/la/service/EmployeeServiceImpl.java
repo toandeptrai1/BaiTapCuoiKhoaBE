@@ -95,7 +95,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             list = employeeRepo.findAll(pageable);
         }
 
-        //List<EmployeeDTO> employeeDTOList = list.stream().map(this::mapToEmpDTO).collect(Collectors.toList());
+
         List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).distinct().collect(Collectors.toList());
 
         return EmployeeResponse.builder()
@@ -265,7 +265,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             });
         }
 
-
+        //mã hoá password
         addEmployeeRequest.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest.getEmployeeLoginPassword()
         ));
         Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
@@ -273,7 +273,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = mapToAddemployeeRequestToEmployee(addEmployeeRequest, department);
         Employee addEmployee = employeeRepo.save(employee);
         List<EmployeeCertification> employeeCertificationList = new ArrayList<>();
-
+        //kiểm tra xem employee có certification không
         if (addEmployeeRequest.getCertifications().size() > 0) {
             for (EmployeeCertificationReq e : addEmployeeRequest.getCertifications()) {
                 EmployeeCertification employeeCertification = new EmployeeCertification();
@@ -283,6 +283,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employeeCertificationList.add(employeeCertification);
             }
         }
+        //Lưu các certification
         if (employeeCertificationList.size() > 0) {
             employeeCertificationList.forEach(employeeCertificationRepo::save);
         }
@@ -332,7 +333,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return Trả về 1 EmployeeDTO
      */
     public EmployeeDTO mapToEmpDTO(Employee employee) {
-
+        //Tạo 1 employeeDTO
         EmployeeDTO.EmployeeDTOBuilder builder = EmployeeDTO.builder()
                 .employeeId(employee.getEmployeeId())
                 .employeeEmail(employee.getEmployeeEmail())
