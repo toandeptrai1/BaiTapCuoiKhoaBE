@@ -43,4 +43,6 @@ public interface EmployeeService {
      */
     EmployeeGetByIDResponse getEmployeeById(Long employeeId);
 
+    Long deleteEmployee(Long employeeId);
+
 }

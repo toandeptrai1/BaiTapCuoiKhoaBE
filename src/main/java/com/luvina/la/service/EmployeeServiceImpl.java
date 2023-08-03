@@ -325,6 +325,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeGetByIDResponse;
     }
 
+    @Override
+    public Long deleteEmployee(Long employeeId) {
+        Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ERR014-ID"));
+        employeeRepo.delete(emp);
+        return employeeId;
+    }
+
 
     /**
      * Xử lý việc map từ 1 Employee sang EmployeeDTO

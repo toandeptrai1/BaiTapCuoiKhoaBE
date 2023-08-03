@@ -11,6 +11,7 @@ import com.luvina.la.exception.PageSizeException;
 import com.luvina.la.payload.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -134,8 +135,22 @@ public class ApplicationExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGetEmployeeException(MethodArgumentTypeMismatchException ex){
 
         Map<String, Object> msg=new HashMap<>();
+        if(ex.getName().equals("employeeId")){
+            msg.put("code","ER013");
+            msg.put("params",List.of("ID"));
+        }else {
+            msg.put("code","ER014");
+            msg.put("params",List.of("ID"));
+        }
+        ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
+        return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleGetEmployeeException(HttpRequestMethodNotSupportedException ex){
 
-        msg.put("code","ER013");
+        Map<String, Object> msg=new HashMap<>();
+
+        msg.put("code","ER001");
         msg.put("params",List.of("ID"));
         ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);

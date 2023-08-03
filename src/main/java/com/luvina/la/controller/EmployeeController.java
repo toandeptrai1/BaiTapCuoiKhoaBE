@@ -133,5 +133,18 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employeeService.getEmployeeById(employeeId));
     }
 
+    @DeleteMapping("/{employeeDelId}")
+    public ResponseEntity<?> deleteEmployee(@PathVariable(name = "employeeDelId") Long employeeId){
+        Map<String, Object> apiResponse = new HashMap<>();
+        apiResponse.put("code", 200);
+        apiResponse.put("employeeId", employeeService.deleteEmployee(employeeId));
+        List<String> params = new ArrayList<>();
+        Map<String, Object> message = new HashMap<>();
+        message.put("code", "MSG003");
+        message.put("prams", params);
+        apiResponse.put("message", message);
+        return ResponseEntity.ok().body(apiResponse);
+    }
+
 
 }
