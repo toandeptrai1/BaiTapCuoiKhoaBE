@@ -2,6 +2,7 @@ package com.luvina.la.payload;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.Data;
 
 @Data

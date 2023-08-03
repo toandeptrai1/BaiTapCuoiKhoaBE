@@ -5,7 +5,6 @@
 
 package com.luvina.la.controller;
 
-import com.luvina.la.dto.EmployeeCertificationDTO;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.OrdValueInvalid;
 import com.luvina.la.exception.PageSizeException;

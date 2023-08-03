@@ -1,12 +1,14 @@
 /**
  * Copyright(C) 2023 Luvina Software Company
- *
+ * <p>
  * Certification.java, June 29, 2023 Toannq
  */
 
 package com.luvina.la.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class Certification {
     private String certificationName;
     @Column(name = "certification_level")
     private Integer certificationLevel;
-    @OneToMany(mappedBy = "certification",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "certification", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EmployeeCertification> EmployeeCertification;
 

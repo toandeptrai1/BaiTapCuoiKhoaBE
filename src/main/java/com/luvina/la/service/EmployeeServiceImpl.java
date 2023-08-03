@@ -96,7 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //List<EmployeeDTO> employeeDTOList = list.stream().map(this::mapToEmpDTO).collect(Collectors.toList());
-        List<EmployeeDTO> employeeDTOList =list.getContent().stream().map(this::mapToEmpDTO).distinct().collect(Collectors.toList());
+        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).distinct().collect(Collectors.toList());
 
         return EmployeeResponse.builder()
                 .code(200)

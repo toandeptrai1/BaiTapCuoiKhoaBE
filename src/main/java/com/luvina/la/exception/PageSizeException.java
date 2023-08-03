@@ -6,11 +6,13 @@ package com.luvina.la.exception;
 
 /**
  * Exception về Page Size
+ *
  * @author Toannq
  */
-public class PageSizeException extends RuntimeException{
+public class PageSizeException extends RuntimeException {
     /**
      * Khởi tạo PageSizeException với message
+     *
      * @param message thông báo về error
      */
     public PageSizeException(String message) {

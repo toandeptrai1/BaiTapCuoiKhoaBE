@@ -4,13 +4,16 @@
  */
 
 package com.luvina.la.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Set;
 
 /**
  * Class chứa các thuộc tính của 1 department
+ *
  * @author Toannq
  */
 @Entity
@@ -23,7 +26,7 @@ public class Department {
     private Long departmentId;
     @Column(name = "department_name")
     private String departmentName;
-    @OneToMany(mappedBy = "department",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<Employee> employees;
 

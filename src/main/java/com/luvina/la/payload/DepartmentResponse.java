@@ -4,15 +4,18 @@
  */
 
 package com.luvina.la.payload;
+
 import com.luvina.la.entity.Department;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
  * Chứa các thuộc tính trả về khi gọi api Get departments
+ *
  * @author Toannq
  */
 @Data

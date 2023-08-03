@@ -14,6 +14,7 @@ import java.util.Date;
 
 /**
  * Class chứa các thông tin của 1 EmployeeCertificationDTO
+ *
  * @author ToanNQ
  */
 @Data

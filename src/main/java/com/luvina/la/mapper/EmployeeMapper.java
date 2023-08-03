@@ -8,15 +8,17 @@ import org.mapstruct.factory.Mappers;
 
 /**
  * use:
- *  EmployeeMapper.MAPPER.toEntity(dto);
- *  EmployeeMapper.MAPPER.toList(list);
+ * EmployeeMapper.MAPPER.toEntity(dto);
+ * EmployeeMapper.MAPPER.toList(list);
  */
 @Mapper
 public interface EmployeeMapper {
-    EmployeeMapper MAPPER = Mappers.getMapper( EmployeeMapper.class );
+    EmployeeMapper MAPPER = Mappers.getMapper(EmployeeMapper.class);
 
     Employee toEntity(EmployeeDTO entity);
+
     Employee toDto(EmployeeDTO entity);
+
     Iterable<EmployeeDTO> toList(Iterable<Employee> list);
 
 }

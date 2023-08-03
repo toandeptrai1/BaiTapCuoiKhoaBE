@@ -15,11 +15,13 @@ import java.util.List;
 
 /**
  * Interface chứa các xử lý logic liên quan đến Employee
+ *
  * @author Toannq
  */
 public interface EmployeeService {
     /**
      * Xử lý việc lấy ra danh sách Employee
+     *
      * @param employeeRequest Danh sách các RequestParams
      * @return EmployeeResponse
      */
@@ -27,6 +29,7 @@ public interface EmployeeService {
 
     /**
      * Thực hiện khai báo 1 phương thức xử lý logic add 1 employee
+     *
      * @param addEmployeeRequest
      * @return Employee
      */
@@ -34,6 +37,7 @@ public interface EmployeeService {
 
     /**
      * Thực hiên khai báo 1 phương thức getEmployeeByID
+     *
      * @param employeeId employeeId cần tìm
      * @return EmployeeGetByIDResponse
      */

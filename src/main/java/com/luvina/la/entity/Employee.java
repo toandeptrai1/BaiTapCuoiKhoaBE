@@ -1,14 +1,16 @@
 /**
  * Copyright(C) 2023 Luvina Software Company
- *
+ * <p>
  * Employee.java, June 29, 2023 Toannq
  */
 
 package com.luvina.la.entity;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,16 +46,16 @@ public class Employee implements Serializable {
 
     @Column(name = "employee_login_password")
     private String employeeLoginPassword;
-    @Column(name="employee_name_kana")
+    @Column(name = "employee_name_kana")
     private String employeeNameKana;
-    @Column(name="employee_birth_date")
+    @Column(name = "employee_birth_date")
     private Date employeeBirthDate;
-    @Column(name="employee_telephone")
+    @Column(name = "employee_telephone")
     private String employeeTelephone;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "department_id",referencedColumnName = "department_id")
+    @JoinColumn(name = "department_id", referencedColumnName = "department_id")
     private Department department;
-    @OneToMany(mappedBy = "employee",fetch = FetchType.EAGER,cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<EmployeeCertification> employeeCertification;
 
 

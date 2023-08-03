@@ -1,10 +1,10 @@
 /**
  * Copyright(C) 2023 Luvina Software Company
- *
  * DepartmentController.java, June 29, 2023 Toannq
  */
 
 package com.luvina.la.controller;
+
 import com.luvina.la.payload.DepartmentResponse;
 import com.luvina.la.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class DepartmentController {
      * @return DepartmentResponse
      */
     @GetMapping("")
-    public DepartmentResponse getDepartment(){
-        return  departmentService.getDepartment();
+    public DepartmentResponse getDepartment() {
+        return departmentService.getDepartment();
     }
 }

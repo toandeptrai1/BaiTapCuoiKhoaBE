@@ -4,18 +4,17 @@
  */
 
 package com.luvina.la.payload;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.NotEmpty;
-import java.util.Date;
 import java.util.List;
 
 /**
  * Class chứa danh sách param của api Add Employee
+ *
  * @author Toannq
  */
 @Data

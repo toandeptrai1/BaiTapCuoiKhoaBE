@@ -25,6 +25,7 @@ public class DepartmentService {
 
     /**
      * lấy ra danh sách Department
+     *
      * @return DepartmentResponse
      */
     public DepartmentResponse getDepartment() {

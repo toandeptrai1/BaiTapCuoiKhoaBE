@@ -4,16 +4,19 @@
  */
 
 package com.luvina.la.payload;
+
 import com.luvina.la.dto.EmployeeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
  * class chứa các thuộc tính sẽ được tra về khi
  * goi api getEmployee
+ *
  * @author Toannq
  */
 @Data

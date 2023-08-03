@@ -1,10 +1,10 @@
 /**
  * Copyright(C) 2023 Luvina Software Company
- *
  * CertificationController.java, June 29, 2023 Toannq
  */
 
 package com.luvina.la.controller;
+
 import com.luvina.la.payload.CertificationResponse;
 import com.luvina.la.service.CertificationService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class CertificationController {
      * @return danh sách cetification
      */
     @GetMapping("")
-    public ResponseEntity<CertificationResponse> getAll(){
-        CertificationResponse certificationResponse=CertificationResponse.builder()
+    public ResponseEntity<CertificationResponse> getAll() {
+        CertificationResponse certificationResponse = CertificationResponse.builder()
                 .code(200)
                 .certifications(certificationService.getAllCertifications())
                 .build();
