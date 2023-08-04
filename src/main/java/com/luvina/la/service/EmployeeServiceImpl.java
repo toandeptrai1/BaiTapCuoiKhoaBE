@@ -332,7 +332,8 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public Long deleteEmployee(Long employeeId) {
-        Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ERR014-ID"));
+        //Kiểm tra xem có tồn tại employee có id này trong db không
+        Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ER014-ID"));
         employeeRepo.delete(emp);
         return employeeId;
     }
