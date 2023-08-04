@@ -43,6 +43,11 @@ public interface EmployeeService {
      */
     EmployeeGetByIDResponse getEmployeeById(Long employeeId);
 
+    /**
+     * Khai báo phương thức xoá 1 employee theo id của employee
+     * @param employeeId id của employee cần xoá
+     * @return  employeeId id của employee đã xoá thành công
+     */
     Long deleteEmployee(Long employeeId);
 
 }

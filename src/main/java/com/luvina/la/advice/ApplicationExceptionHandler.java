@@ -112,7 +112,7 @@ public class ApplicationExceptionHandler {
     }
 
     /**
-     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById
+     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById,deleleEmployee
      * @param ex Đối tượng error
      * @return api chứa thông tin lỗi
      */
@@ -127,7 +127,7 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     /**
-     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById
+     *Xử lý ngoại lệ khi khi thực hiện getEmployeeById,deleleEmployee
      * @param ex Đối tượng error
      * @return api chứa thông tin lỗi
      */
@@ -145,6 +145,12 @@ public class ApplicationExceptionHandler {
         ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    /**
+     *Xử lý ngoại lệ khi khi thực hiện ,deleleEmployee
+     * @param ex Đối tượng error
+     * @return api chứa thông tin lỗi
+     */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleGetEmployeeException(HttpRequestMethodNotSupportedException ex){
 

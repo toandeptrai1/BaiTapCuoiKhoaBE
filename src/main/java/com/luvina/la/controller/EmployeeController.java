@@ -133,6 +133,12 @@ public class EmployeeController {
         return ResponseEntity.ok().body(employeeService.getEmployeeById(employeeId));
     }
 
+    /**
+     * Xử lý việc gọi phương thức deleteEmployee từ service và
+     * trả về api chứa id của employee vừa xoá
+     * @param employeeId employeeId cần xoá
+     * @return api chứa id của employee vừa xoá
+     */
     @DeleteMapping("/{employeeDelId}")
     public ResponseEntity<?> deleteEmployee(@PathVariable(name = "employeeDelId") Long employeeId){
         Map<String, Object> apiResponse = new HashMap<>();
