@@ -21,10 +21,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -96,7 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
 
-        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).distinct().collect(Collectors.toList());
+        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).collect(Collectors.toList());
 
         return EmployeeResponse.builder()
                 .code(200)
@@ -316,9 +321,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
         //Kiểm tra xem có certification không
         if (employee.getEmployeeCertification().size() > 0) {
+
             employeeGetByIDResponse.setCertifications(employee.getEmployeeCertification().stream()
-                    .map(this::mapToEmployeeCertificationDTO).sorted(Comparator.comparingLong(EmployeeCertificationDTO
-                            ::getCertificationId)).collect(Collectors.toList()));
+                    .sorted(Comparator.comparing(cer->
+                            cer.getCertification().getCertificationLevel())).toList().stream()
+                    .map(this::mapToEmployeeCertificationDTO).collect(Collectors.toList()));
         } else {
             employeeGetByIDResponse.setCertifications(List.of());
         }
@@ -512,6 +519,55 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
+
+    public EmployeeResponse getEmployees(EmployeeRequest employeeRequest) {
+
+
+        Page<Employee> list;
+        Pageable pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
+                Integer.parseInt(employeeRequest.getLimit()));
+
+        if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
+                && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
+        ) {
+            Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
+                    .orElseThrow();
+            list = employeeRepo.findByEmployeeNameAndDepartmentIdSort(employeeRequest.getEmployee_name()
+                    ,Long.valueOf(employeeRequest.getDepartment_id()),pageable,
+                    employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                    employeeRequest.getOrd_end_date());
+        } else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
+                || (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))) {
+            if (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals("")) {
+                Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
+                        .orElseThrow();
+                list = employeeRepo.findByDepartmentIdSort(Long.valueOf(employeeRequest.getDepartment_id()),pageable,
+                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                        employeeRequest.getOrd_end_date());
+            } else {
+                list = employeeRepo.findByEmployeeNameSort(employeeRequest.getEmployee_name(),pageable,
+                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                        employeeRequest.getOrd_end_date());
+            }
+
+        } else {
+            list = employeeRepo.findAllAndSort(
+                    employeeRequest.getOrd_employee_name(),
+                    employeeRequest.getOrd_certification_name(),
+                    employeeRequest.getOrd_end_date(),pageable);
+        }
+
+
+        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).collect(Collectors.toList());
+
+        return EmployeeResponse.builder()
+                .code(200)
+                .totalRecords((int) list.getTotalElements())
+                .employees(employeeDTOList)
+                .build();
+    }
+
+
 
 
 }

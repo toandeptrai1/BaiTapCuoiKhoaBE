@@ -93,7 +93,7 @@ public class EmployeeController {
                 .ord_end_date(ord_end_date)
                 .ord_certification_name(ord_certification_name)
                 .build();
-        return employeeService.getEmployee(employeeRequest);
+        return employeeService.getEmployees(employeeRequest);
     }
 
     /**
