@@ -26,7 +26,8 @@ public class Department {
     private Long departmentId;
     @Column(name = "department_name")
     private String departmentName;
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "department")
     @JsonIgnore
     private Set<Employee> employees;
 

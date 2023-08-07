@@ -52,7 +52,8 @@ public class Employee implements Serializable {
     private Date employeeBirthDate;
     @Column(name = "employee_telephone")
     private String employeeTelephone;
-    @ManyToOne(fetch = FetchType.EAGER)
+//    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "department_id")
     private Department department;
     @OneToMany(mappedBy = "employee", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)

@@ -314,11 +314,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .departmentId(employee.getDepartment().getDepartmentId())
                 .departmentName(employee.getDepartment().getDepartmentName())
                 .build();
-        //Kiểm tra xem có certification không
+        //Kiểm tra xem có certification không và sắp xếp certification theo level
         if (employee.getEmployeeCertification().size() > 0) {
             employeeGetByIDResponse.setCertifications(employee.getEmployeeCertification().stream()
-                    .map(this::mapToEmployeeCertificationDTO).sorted(Comparator.comparingLong(EmployeeCertificationDTO
-                            ::getCertificationId)).collect(Collectors.toList()));
+                    .sorted(Comparator.comparing(cer->cer.getCertification().getCertificationLevel())).toList()
+                    .stream().map(this::mapToEmployeeCertificationDTO).collect(Collectors.toList()));
         } else {
             employeeGetByIDResponse.setCertifications(List.of());
         }
@@ -336,6 +336,207 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ER014-ID"));
         employeeRepo.delete(emp);
         return employeeId;
+    }
+
+    @Override
+    public Employee editEmployee(AddEmployeeRequest addEmployeeRequest) {
+        //Throw exception nếu EmployeeId không hợp lệ
+        if(addEmployeeRequest.getEmployeeId()==null){
+            throw new EmployeeAddException("ER001-ID");
+        }
+        Employee employee=employeeRepo.findByEmployeeId(addEmployeeRequest.getEmployeeId())
+                .orElseThrow(()->new EmployeeAddException("ER013-ID"));
+
+
+        //Throw exception nếu EmployeeLoginId không hợp lệ
+        if (addEmployeeRequest.getEmployeeLoginId() == null) {
+            throw new EmployeeAddException("ER001-アカウント名");
+        }
+        if(!addEmployeeRequest.getEmployeeLoginId().equals(employee.getEmployeeLoginId())){
+            if (addEmployeeRequest.getEmployeeLoginId().length() > 50) {
+                throw new EmployeeAddException("ER006-アカウント名");
+            } else if (!addEmployeeRequest.getEmployeeLoginId().matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
+                throw new EmployeeAddException("ER019-アカウント名");
+            } else if (employeeRepo.findByEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId()).isPresent()) {
+                throw new EmployeeAddException("ER003-アカウント名");
+            }
+        }
+
+
+        //Throw exception nếu employeeName không hợp lệ
+        if (addEmployeeRequest.getEmployeeName() == null || addEmployeeRequest.getEmployeeName().equals("")) {
+            throw new EmployeeAddException("ER001-氏名");
+        } else if (addEmployeeRequest.getEmployeeName().length() > 125) {
+            throw new EmployeeAddException("ER006-氏名");
+        }
+
+        //Throw exception nếu employeeNameKana không hợp lệ
+        if (addEmployeeRequest.getEmployeeNameKana() == null || addEmployeeRequest.getEmployeeNameKana().equals("")) {
+            throw new EmployeeAddException("ER001-カタカナ氏名");
+        } else if (addEmployeeRequest.getEmployeeNameKana().length() > 125) {
+            throw new EmployeeAddException("ER006-カタカナ氏名");
+        } else if (!addEmployeeRequest.getEmployeeNameKana().matches("[ぁ-んァ-ン一-龯々〆〤ー・｜｡-ﾟ]+")) {
+            throw new EmployeeAddException("ER009-カタカナ氏名");
+        }
+
+        //Throw exception nếu employeeBirthDate không hợp lệ
+        if (addEmployeeRequest.getEmployeeBirthDate() == null || addEmployeeRequest.getEmployeeBirthDate().equals("")) {
+            throw new EmployeeAddException("ER001-カタカナ氏名");
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        Date employeeBirdthDate;
+
+        if (!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())) {
+            throw new EmployeeAddException("ER011-生年月日");
+        }
+        try {
+            employeeBirdthDate = sdf.parse(addEmployeeRequest.getEmployeeBirthDate());
+        } catch (ParseException e) {
+            throw new EmployeeAddException("ER005-生年月日-yyyy/MM/dd");
+        }
+
+
+        //Throw exception nếu employeeEmail không hợp lệ
+        if (addEmployeeRequest.getEmployeeEmail() == null || addEmployeeRequest.getEmployeeEmail().equals("")) {
+            throw new EmployeeAddException("ER001-メールアドレス");
+        } else if (addEmployeeRequest.getEmployeeEmail().length() > 125) {
+            throw new EmployeeAddException("ER006-メールアドレス");
+        }
+        //Throw exception nếu employeeTelephone không hợp lệ
+        if (addEmployeeRequest.getEmployeeTelephone() == null || addEmployeeRequest.getEmployeeTelephone().equals("")) {
+            throw new EmployeeAddException("ER001-電話番号");
+        } else if (addEmployeeRequest.getEmployeeTelephone().length() > 50) {
+            throw new EmployeeAddException("ER006-電話番号");
+        } else if (!addEmployeeRequest.getEmployeeTelephone().matches("[a-zA-Z0-9!-/:-@\\\\\\[-`{-~]+")) {
+            throw new EmployeeAddException("ER008-電話番号");
+        }
+
+        //Throw exception nếu employeeLoginPassword không hợp lệ
+        if (addEmployeeRequest.getEmployeeLoginPassword() == null || addEmployeeRequest.getEmployeeLoginPassword()
+                .equals("")) {
+            throw new EmployeeAddException("ER001-パスワード");
+        } else if (!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())
+                &&(addEmployeeRequest.getEmployeeLoginPassword().length() > 50
+                || addEmployeeRequest.getEmployeeLoginPassword().length() < 8)) {
+            throw new EmployeeAddException("ER007-パスワード-8-50");
+        }
+        //Throw exception nếu departmentId không hợp lệ
+
+        if (addEmployeeRequest.getDepartmentId() == null) {
+            throw new EmployeeAddException("ER002-グループ");
+        }
+        Long departId;
+        try {
+            departId = Long.parseLong(addEmployeeRequest.getDepartmentId());
+        } catch (NumberFormatException ex) {
+            throw new EmployeeAddException("ER0018-グループ");
+        }
+        if (departId <= 0) {
+            throw new EmployeeAddException("ER0018-グループ");
+        }
+
+        //Throw exception nếu Certifications không hợp lệ
+        if (addEmployeeRequest.getCertifications().size() > 0) {
+            addEmployeeRequest.getCertifications().forEach(cer -> {
+                //Throw exception nếu CertificationStartDate không hợp lệ
+                if (cer.getCertificationStartDate() == null || cer.getCertificationStartDate().equals("")) {
+                    throw new EmployeeAddException("ER001-資格交付日");
+                }
+                Date endDate;
+                Date startDate;
+                if (!checkDateValid(cer.getCertificationStartDate())) {
+                    throw new EmployeeAddException("ER011-資格交付日");
+                }
+                try {
+                    startDate = sdf.parse(cer.getCertificationStartDate());
+                } catch (ParseException e) {
+                    throw new EmployeeAddException("ER005-資格交付日-yyyy/MM/dd");
+                }
+                ///Throw exception nếu CertificationEndDate không hợp lệ
+                if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
+                    throw new EmployeeAddException("ER001-失効日");
+                }
+                if (!checkDateValid(cer.getCertificationEndDate())) {
+                    throw new EmployeeAddException("ER011-失効日");
+                }
+                try {
+                    endDate = sdf.parse(cer.getCertificationEndDate());
+                    if (endDate.before(startDate) || endDate.equals(startDate)) {
+                        throw new EmployeeAddException("ER012");
+                    }
+                } catch (ParseException e) {
+                    throw new EmployeeAddException("ER005-失効日-yyyy/MM/dd");
+
+                }
+
+                ///Throw exception nếu EmployeeCertificationScore không hợp lệ
+                if (cer.getEmployeeCertificationScore() == null || cer.getEmployeeCertificationScore().equals("")) {
+                    throw new EmployeeAddException("ER001-点数");
+                }
+                long score;
+                try {
+                    score = Long.parseLong(cer.getEmployeeCertificationScore());
+                    if (score <= 0) {
+                        throw new EmployeeAddException("ER018-点数");
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new EmployeeAddException("ER018-点数");
+                }
+                //certificationId
+                if (cer.getCertificationId() == null || cer.getCertificationId().equals("")) {
+                    throw new EmployeeAddException("ER001-資格");
+                }
+                long certiId;
+                try {
+                    certiId = Long.parseLong(cer.getCertificationId());
+                    if (certiId <= 0) {
+                        throw new EmployeeAddException("ER018-資格");
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new EmployeeAddException("ER018-資格");
+                }
+                if (!certificationRepo.existsById(Long.parseLong(cer.getCertificationId()))) {
+                    throw new EmployeeAddException("ER004-資格");
+                }
+
+            });
+        }
+
+        //mã hoá password nếu password khác
+        if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
+            employee.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest
+                    .getEmployeeLoginPassword()
+            ));
+        }
+        Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
+                .orElseThrow(() -> new EmployeeAddException("ER004-グループ"));
+        employee.setEmployeeName(addEmployeeRequest.getEmployeeName());
+        employee.setEmployeeEmail(addEmployeeRequest.getEmployeeEmail());
+        employee.setEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId());
+        employee.setDepartment(department);
+        employee.setEmployeeBirthDate(employeeBirdthDate);
+        employee.setEmployeeNameKana(addEmployeeRequest.getEmployeeNameKana());
+        employee.setEmployeeTelephone(addEmployeeRequest.getEmployeeTelephone());
+
+
+        List<EmployeeCertification> employeeCertificationList = new ArrayList<>();
+        //kiểm tra xem employee có certification không
+        if (addEmployeeRequest.getCertifications().size() > 0) {
+
+            for (EmployeeCertificationReq e : addEmployeeRequest.getCertifications()) {
+                EmployeeCertification employeeCertification = new EmployeeCertification();
+                Certification certification = new Certification();
+                certification = certificationRepo.findById(Long.parseLong(e.getCertificationId())).orElseThrow();
+                employeeCertification = mapEmployeeCertificationReqToEmCertificate(e, certification, employee);
+                employeeCertificationList.add(employeeCertification);
+            }
+        }
+        //Lưu các certification
+        employee.setEmployeeCertification(employeeCertificationList);
+        Employee addEmployee = employeeRepo.save(employee);
+        return addEmployee;
     }
 
 
