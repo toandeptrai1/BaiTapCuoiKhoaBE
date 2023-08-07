@@ -54,35 +54,35 @@ public class EmployeeController {
         //Xử lý các ngoại lệ
         if (ord_employee_name == null || (!ord_employee_name.equalsIgnoreCase("asc")
                 && !ord_employee_name.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ERR021");
+            throw new OrdValueInvalid("ER021");
 
         }
         if (ord_certification_name == null || (!ord_certification_name.equalsIgnoreCase("asc")
                 && !ord_certification_name.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ERR021");
+            throw new OrdValueInvalid("ER021");
 
         }
         if (ord_end_date == null || (!ord_end_date.equalsIgnoreCase("asc")
                 && !ord_end_date.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ERR021");
+            throw new OrdValueInvalid("ER021");
 
         }
         try {
             if (Integer.parseInt(limit) < 0) {
-                throw new PageSizeException("ERR018-リミット");
+                throw new PageSizeException("ER018-リミット");
             }
 
         } catch (NumberFormatException ex) {
-            throw new PageSizeException("ERR018-リミット");
+            throw new PageSizeException("ER018-リミット");
         }
         try {
 
             if (Integer.parseInt(offset) < 0) {
-                throw new PageSizeException("ERR018-オフセット");
+                throw new PageSizeException("ER018-オフセット");
             }
 
         } catch (NumberFormatException ex) {
-            throw new PageSizeException("ERR018-オフセット");
+            throw new PageSizeException("ER018-オフセット");
         }
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .employee_name(employee_name)
@@ -150,6 +150,32 @@ public class EmployeeController {
         message.put("prams", params);
         apiResponse.put("message", message);
         return ResponseEntity.ok().body(apiResponse);
+    }
+
+    /**
+     * Xử lý gọi lại phương thức edit Employee từ EmployeeService
+     * và trả về api
+     * @param employee Dữ liệu của employee cần thêm
+     * @return
+     */
+    @PutMapping("/edit")
+    public ResponseEntity<?> editEmployee(@RequestBody AddEmployeeRequest employee) {
+
+        if (employee.getCertifications() == null) {
+            employee.setCertifications(new ArrayList<>());
+        }
+        Employee e = employeeService.editEmployee(employee);
+        Map<String, Object> apiResponse = new HashMap<>();
+        apiResponse.put("code", 200);
+        apiResponse.put("employeeId", e.getEmployeeId());
+        List<String> params = new ArrayList<>();
+        Map<String, Object> message = new HashMap<>();
+        message.put("code", "MSG001");
+        message.put("prams", params);
+        apiResponse.put("message", message);
+
+        return ResponseEntity.ok().body(apiResponse);
+
     }
 
 

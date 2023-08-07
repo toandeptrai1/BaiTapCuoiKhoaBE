@@ -50,5 +50,12 @@ public interface EmployeeService {
      */
     Long deleteEmployee(Long employeeId);
 
+    /**
+     * Thực hiện khai báo 1 phương thức xử lý logic update 1 employee
+     *
+     * @param addEmployeeRequest
+     * @return Employee
+     */
+    Employee editEmployee(AddEmployeeRequest addEmployeeRequest);
 
 }
