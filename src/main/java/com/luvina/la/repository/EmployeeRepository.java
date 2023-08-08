@@ -69,7 +69,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             "WHERE e.employeeName LIKE %:employeeName% AND " +
             "d.departmentId = :departmentId " +
             "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MAX(c2.certificationLevel) " +
+            "    SELECT MIN(c2.certificationLevel) " +
             "    FROM Employee e2 " +
             "    LEFT JOIN e2.employeeCertification ec2 " +
             "    LEFT JOIN ec2.certification c2 " +
@@ -100,7 +100,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             "LEFT JOIN ec.certification c " +
             "WHERE e.employeeName LIKE %:employeeName% " +
             "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MAX(c2.certificationLevel) " +
+            "    SELECT MIN(c2.certificationLevel) " +
             "    FROM Employee e2 " +
             "    LEFT JOIN e2.employeeCertification ec2 " +
             "    LEFT JOIN ec2.certification c2 " +
@@ -132,7 +132,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             "LEFT JOIN ec.certification c " +
             "WHERE (e.department.departmentId = :departmentId OR e.department IS NULL) " +
             "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MAX(c2.certificationLevel) " +
+            "    SELECT MIN(c2.certificationLevel) " +
             "    FROM Employee e2 " +
             "    LEFT JOIN e2.employeeCertification ec2 " +
             "    LEFT JOIN ec2.certification c2 " +
@@ -162,7 +162,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             "LEFT JOIN e.employeeCertification ec " +
             "LEFT JOIN ec.certification c " +
             "WHERE c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MAX(c2.certificationLevel) " +
+            "    SELECT MIN(c2.certificationLevel) " +
             "    FROM Employee e2 " +
             "    LEFT JOIN e2.employeeCertification ec2 " +
             "    LEFT JOIN ec2.certification c2 "+

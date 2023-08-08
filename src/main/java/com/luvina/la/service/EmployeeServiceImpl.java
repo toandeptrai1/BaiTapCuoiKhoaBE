@@ -47,63 +47,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeCertificationRepo employeeCertificationRepo;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
-     *
-     * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
-     * @return Trả về 1 EmployeeResponse
-     */
-    @Override
-    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest) {
-        Pageable pageable;
-        Page<Employee> list;
-        String[] fields = {"employeeName", "employeeCertification.certification.certificationName",
-                "employeeCertification.endDate"};
-        String[] directions = {employeeRequest.getOrd_employee_name(), employeeRequest.getOrd_certification_name(),
-                employeeRequest.getOrd_end_date()};
-        List<Sort.Order> sortOrders = getSortOrders(fields, directions);
-        if (!sortOrders.isEmpty()) {
-            Sort sort = Sort.by(sortOrders);
-            pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
-                    Integer.parseInt(employeeRequest.getLimit()), sort);
-
-
-        } else {
-            pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
-                    Integer.parseInt(employeeRequest.getLimit()), Sort.by("employeeId"));
-
-        }
-        if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
-                && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
-        ) {
-            Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
-                    .orElseThrow();
-            list = employeeRepo.findByDepartmentAndEmployeeNameContaining(department, employeeRequest.getEmployee_name()
-                    , pageable);
-        } else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
-                || (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))) {
-            if (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals("")) {
-                Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
-                        .orElseThrow();
-                list = employeeRepo.findByDepartmentOrEmployeeNameContaining(department, null, pageable);
-            } else {
-                list = employeeRepo.findByDepartmentOrEmployeeNameContaining(null,
-                        employeeRequest.getEmployee_name(), pageable);
-            }
-
-        } else {
-            list = employeeRepo.findAll(pageable);
-        }
-
-
-        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).distinct().collect(Collectors.toList());
-
-        return EmployeeResponse.builder()
-                .code(200)
-                .totalRecords((int) list.getTotalElements())
-                .employees(employeeDTOList)
-                .build();
-    }
 
     /**
      * Xử lý logic cho việc add 1 employee vào bảng employee
@@ -339,6 +282,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeId;
     }
 
+    /**
+     * Xử lý việc update 1 employee
+     * @param addEmployeeRequest
+     * @return employee thông tin của employee vừa update được
+     */
     @Override
     @Transactional
     public Employee editEmployee(AddEmployeeRequest addEmployeeRequest) {
@@ -419,11 +367,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (addEmployeeRequest.getEmployeeLoginPassword() == null || addEmployeeRequest.getEmployeeLoginPassword()
                 .equals("")) {
             throw new EmployeeAddException("ER001-パスワード");
-        } else if (!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())
-                &&(addEmployeeRequest.getEmployeeLoginPassword().length() > 50
-                || addEmployeeRequest.getEmployeeLoginPassword().length() < 8)) {
-            throw new EmployeeAddException("ER007-パスワード-8-50");
         }
+        if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
+           if ((addEmployeeRequest.getEmployeeLoginPassword().length() > 50
+                    || addEmployeeRequest.getEmployeeLoginPassword().length() < 8)) {
+                throw new EmployeeAddException("ER007-パスワード-8-50");
+            }
+
+        }
+
         //Throw exception nếu departmentId không hợp lệ
 
         if (addEmployeeRequest.getDepartmentId() == null) {
@@ -438,6 +390,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (departId <= 0) {
             throw new EmployeeAddException("ER0018-グループ");
         }
+        //Kiểm tra xem có department trong db không
+        Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
+                .orElseThrow(() -> new EmployeeAddException("ER004-グループ"));
 
         //Throw exception nếu Certifications không hợp lệ
         if (addEmployeeRequest.getCertifications().size() > 0) {
@@ -506,14 +461,13 @@ public class EmployeeServiceImpl implements EmployeeService {
             });
         }
 
-        //mã hoá password nếu password khác
+        //Mã hoá password nếu password khác
         if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
             employee.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest
                     .getEmployeeLoginPassword()
             ));
         }
-        Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
-                .orElseThrow(() -> new EmployeeAddException("ER004-グループ"));
+
         employee.setEmployeeName(addEmployeeRequest.getEmployeeName());
         employee.setEmployeeEmail(addEmployeeRequest.getEmployeeEmail());
         employee.setEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId());
@@ -566,10 +520,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeName(employee.getEmployeeName())
                 .employeeBirthDate(employee.getEmployeeBirthDate());
 
-
+        //Lấy ra danh sách EmployeeCertification
         List<EmployeeCertification> employeeCertifications = employee.getEmployeeCertification();
+        //Kiểm tra xem certification không
         if (!employeeCertifications.isEmpty()) {
-            EmployeeCertification firstCertification = employeeCertifications.get(0);
+            EmployeeCertification firstCertification = employeeCertifications.stream()
+                    .sorted(Comparator.comparing(cer->cer.getCertification().getCertificationLevel())).toList().get(0);
             builder.certificationName(firstCertification.getCertification().getCertificationName())
                     .score(firstCertification.getScore())
                     .endDate(firstCertification.getEndDate());
@@ -649,36 +605,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-    /**
-     * Xử lý việc chuyển đổi fields,directions thành các Sort.Order tương ứng
-     *
-     * @param fields     danh sách các fields cần sắp xếp
-     * @param directions danh sách các thứ tự sắp xếp
-     * @return Danh sách Sort.Order
-     */
-    public List<Sort.Order> getSortOrders(String[] fields, String[] directions) {
-        List<Sort.Order> sortOrders = new ArrayList<>();
-
-        if (fields == null || directions == null) {
-            return sortOrders;
-        }
-
-        int length = Math.min(fields.length, directions.length);
-        for (int i = 0; i < length; i++) {
-            String field = fields[i];
-            String direction = directions[i];
-
-            if (field != null && !field.isEmpty() && direction != null && !direction.isEmpty()) {
-                Sort.Direction sortDirection = Sort.Direction.ASC;
-                if (direction.equalsIgnoreCase("desc")) {
-                    sortDirection = Sort.Direction.DESC;
-                }
-                sortOrders.add(new Sort.Order(sortDirection, field));
-            }
-        }
-
-        return sortOrders;
-    }
 
     /**
      * Phương thức kiểm tra ngày có hợp lệ không
@@ -722,14 +648,20 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
-
-    public EmployeeResponse getEmployees(EmployeeRequest employeeRequest) {
+    /**
+     * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
+     *
+     * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
+     * @return Trả về 1 EmployeeResponse
+     */
+    @Override
+    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest) {
 
 
         Page<Employee> list;
         Pageable pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
                 Integer.parseInt(employeeRequest.getLimit()));
-
+        //Kiểm tra các trường employee_name,departmentId xem có null hoặc rỗng không
         if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
                 && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
         ) {
