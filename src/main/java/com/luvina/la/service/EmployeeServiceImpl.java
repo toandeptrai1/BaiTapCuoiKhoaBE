@@ -331,6 +331,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return employeeId id của employee
      */
     @Override
+    @Transactional
     public Long deleteEmployee(Long employeeId) {
         //Kiểm tra xem có tồn tại employee có id này trong db không
         Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ER014-ID"));
@@ -339,6 +340,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
+    @Transactional
     public Employee editEmployee(AddEmployeeRequest addEmployeeRequest) {
         //Throw exception nếu EmployeeId không hợp lệ
         if(addEmployeeRequest.getEmployeeId()==null){
@@ -533,10 +535,17 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employeeCertificationList.add(employeeCertification);
             }
         }
+        Employee editEmployee = employeeRepo.save(employee);
+        //Xóa các hết các dữ liệu ở bảng employees_certifications của employee có employeeId cần update
+        employeeCertificationRepo.deleteByEmployeeEmployeeId(editEmployee.getEmployeeId());
+
         //Lưu các certification
-        employee.setEmployeeCertification(employeeCertificationList);
-        Employee addEmployee = employeeRepo.save(employee);
-        return addEmployee;
+        if(employeeCertificationList.size()>0){
+            employeeCertificationList.forEach(employeeCertificationRepo::save);
+        }
+
+
+        return editEmployee;
     }
 
 

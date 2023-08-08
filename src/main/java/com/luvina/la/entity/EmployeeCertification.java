@@ -30,10 +30,10 @@ public class EmployeeCertification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_certification_id.certification.")
     private Long employeeCertificationId;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id")
     private Employee employee;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "certification_id")
     private Certification certification;
     @Column(name = "start_date")

@@ -14,5 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Toannq
  */
 public interface EmployeeCertificationRepo extends JpaRepository<EmployeeCertification, Long> {
+    void deleteByEmployeeEmployeeId(Long employeeId);
 
 }
