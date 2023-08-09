@@ -254,6 +254,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeBirthDate(employee.getEmployeeBirthDate())
                 .employeeLoginId(employee.getEmployeeLoginId())
                 .employeeNameKana(employee.getEmployeeNameKana())
+                .employeeLoginPassword(employee.getEmployeeLoginPassword())
                 .departmentId(employee.getDepartment().getDepartmentId())
                 .departmentName(employee.getDepartment().getDepartmentName())
                 .build();

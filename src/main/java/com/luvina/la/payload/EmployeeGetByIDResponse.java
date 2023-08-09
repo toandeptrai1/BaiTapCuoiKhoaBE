@@ -26,5 +26,6 @@ public class EmployeeGetByIDResponse {
     private String employeeTelephone;
     private String employeeNameKana;
     private String employeeLoginId;
+    private String employeeLoginPassword;
     private List<EmployeeCertificationDTO> certifications;
 }
