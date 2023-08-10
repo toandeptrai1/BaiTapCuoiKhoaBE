@@ -46,6 +46,59 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final CertificationRepository certificationRepo;
     private final EmployeeCertificationRepo employeeCertificationRepo;
     private final PasswordEncoder passwordEncoder;
+    /**
+     * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
+     *
+     * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
+     * @return Trả về 1 EmployeeResponse
+     */
+    @Override
+    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest) {
+
+
+        Page<Employee> list;
+        Pageable pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
+                Integer.parseInt(employeeRequest.getLimit()));
+        //Kiểm tra các trường employee_name,departmentId xem có null hoặc rỗng không
+        if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
+                && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
+        ) {
+            Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
+                    .orElseThrow();
+            list = employeeRepo.findByEmployeeNameAndDepartmentIdSort(employeeRequest.getEmployee_name()
+                    ,Long.valueOf(employeeRequest.getDepartment_id()),pageable,
+                    employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                    employeeRequest.getOrd_end_date());
+        } else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
+                || (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))) {
+            if (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals("")) {
+                Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
+                        .orElseThrow();
+                list = employeeRepo.findByDepartmentIdSort(Long.valueOf(employeeRequest.getDepartment_id()),pageable,
+                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                        employeeRequest.getOrd_end_date());
+            } else {
+                list = employeeRepo.findByEmployeeNameSort(employeeRequest.getEmployee_name(),pageable,
+                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                        employeeRequest.getOrd_end_date());
+            }
+
+        } else {
+            list = employeeRepo.findAllAndSort(
+                    employeeRequest.getOrd_employee_name(),
+                    employeeRequest.getOrd_certification_name(),
+                    employeeRequest.getOrd_end_date(),pageable);
+        }
+
+
+        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).collect(Collectors.toList());
+
+        return EmployeeResponse.builder()
+                .code(200)
+                .totalRecords((int) list.getTotalElements())
+                .employees(employeeDTOList)
+                .build();
+    }
 
 
     /**
@@ -365,9 +418,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //Throw exception nếu employeeLoginPassword không hợp lệ
-        if (addEmployeeRequest.getEmployeeLoginPassword() == null || addEmployeeRequest.getEmployeeLoginPassword()
-                .equals("")) {
+
+        if (addEmployeeRequest.getEmployeeLoginPassword() == null) {
             throw new EmployeeAddException("ER001-パスワード");
+        }
+        if( addEmployeeRequest.getEmployeeLoginPassword().equals("")){
+            addEmployeeRequest.setEmployeeLoginPassword(employee.getEmployeeLoginPassword());
+
         }
         if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
            if ((addEmployeeRequest.getEmployeeLoginPassword().length() > 50
@@ -468,7 +525,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     .getEmployeeLoginPassword()
             ));
         }
-
+        //Xét lại giá trị cho employee
         employee.setEmployeeName(addEmployeeRequest.getEmployeeName());
         employee.setEmployeeEmail(addEmployeeRequest.getEmployeeEmail());
         employee.setEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId());
@@ -508,7 +565,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc map từ 1 Employee sang EmployeeDTO
      *
      * @param employee Thông tin của 1 Employee
-     * @return Trả về 1 EmployeeDTO
+     * @return Trả về 1 EmployeeDTO thông tin về EmployeeDTO sau khi map
      */
     public EmployeeDTO mapToEmpDTO(Employee employee) {
         //Tạo 1 employeeDTO
@@ -541,7 +598,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      *
      * @param addEmployeeRequest
      * @param department
-     * @return Employee
+     * @return Employee thông tin của employee sau khi map
      */
     public Employee mapToAddemployeeRequestToEmployee(AddEmployeeRequest addEmployeeRequest, Department department) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -572,7 +629,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param req           EmployeeCertificationReq cần chuyển đổi
      * @param certification certification chứng chỉ tiếng nhật
      * @param employee      employee
-     * @return EmployeeCertification
+     * @return EmployeeCertification thông tin của EmployeeCertification sau khi map
      */
     public EmployeeCertification mapEmployeeCertificationReqToEmCertificate(EmployeeCertificationReq req, Certification
             certification, Employee employee) {
@@ -611,7 +668,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Phương thức kiểm tra ngày có hợp lệ không
      *
      * @param dateInput chuỗi date đầu vào
-     * @return boolean
+     * @return boolean true néu hợp lệ false nếu không hợp lệ
      */
     public Boolean checkDateValid(String dateInput) {
         String[] dateFormats = {"dd/MM/yyyy", "yyyy/MM/dd", "MM/dd/yyyy", "dd-MM-yyyy", "yyyy-MM-dd", "MM-dd-yyyy"};
@@ -637,7 +694,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * Xử lý việc map từ 1 EmployeeCertification về 1 EmployeeCertificationDTO
      *
      * @param employeeCertification Dữ liệu EmployeeCertification cần chuyển
-     * @return EmployeeCertificationDTO
+     * @return EmployeeCertificationDTO thông tin của chứng chỉ
      */
     public EmployeeCertificationDTO mapToEmployeeCertificationDTO(EmployeeCertification employeeCertification) {
 
@@ -649,59 +706,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
-    /**
-     * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
-     *
-     * @param employeeRequest chứa các thuộc tính là các điều kiện để thực hiện request
-     * @return Trả về 1 EmployeeResponse
-     */
-    @Override
-    public EmployeeResponse getEmployee(EmployeeRequest employeeRequest) {
 
-
-        Page<Employee> list;
-        Pageable pageable = PageRequest.of(Integer.parseInt(employeeRequest.getOffset()),
-                Integer.parseInt(employeeRequest.getLimit()));
-        //Kiểm tra các trường employee_name,departmentId xem có null hoặc rỗng không
-        if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
-                && (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))
-        ) {
-            Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
-                    .orElseThrow();
-            list = employeeRepo.findByEmployeeNameAndDepartmentIdSort(employeeRequest.getEmployee_name()
-                    ,Long.valueOf(employeeRequest.getDepartment_id()),pageable,
-                    employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
-                    employeeRequest.getOrd_end_date());
-        } else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
-                || (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))) {
-            if (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals("")) {
-                Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
-                        .orElseThrow();
-                list = employeeRepo.findByDepartmentIdSort(Long.valueOf(employeeRequest.getDepartment_id()),pageable,
-                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
-                        employeeRequest.getOrd_end_date());
-            } else {
-                list = employeeRepo.findByEmployeeNameSort(employeeRequest.getEmployee_name(),pageable,
-                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
-                        employeeRequest.getOrd_end_date());
-            }
-
-        } else {
-            list = employeeRepo.findAllAndSort(
-                    employeeRequest.getOrd_employee_name(),
-                    employeeRequest.getOrd_certification_name(),
-                    employeeRequest.getOrd_end_date(),pageable);
-        }
-
-
-        List<EmployeeDTO> employeeDTOList = list.getContent().stream().map(this::mapToEmpDTO).collect(Collectors.toList());
-
-        return EmployeeResponse.builder()
-                .code(200)
-                .totalRecords((int) list.getTotalElements())
-                .employees(employeeDTOList)
-                .build();
-    }
 
 
 
