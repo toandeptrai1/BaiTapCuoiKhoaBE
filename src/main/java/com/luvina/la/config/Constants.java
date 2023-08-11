@@ -9,6 +9,8 @@ public class Constants {
     public static final String SPRING_PROFILE_PRODUCTION = "prod";
     public static final boolean IS_CROSS_ALLOW = true;
 
+    public static final String ER001 = "ER001";
+
     public static final String JWT_SECRET = "Luvina-Academe";
     public static final long JWT_EXPIRATION = 160 * 60 * 60; // 7 day
 

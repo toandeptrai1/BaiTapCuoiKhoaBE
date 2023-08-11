@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -225,9 +224,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     }
                 } catch (ParseException e) {
                     throw new EmployeeAddException("ER005-失効日-yyyy/MM/dd");
-
                 }
-
                 ///Throw exception nếu EmployeeCertificationScore không hợp lệ
                 if (cer.getEmployeeCertificationScore() == null || cer.getEmployeeCertificationScore().equals("")) {
                     throw new EmployeeAddException("ER001-点数");
@@ -431,9 +428,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     || addEmployeeRequest.getEmployeeLoginPassword().length() < 8)) {
                 throw new EmployeeAddException("ER007-パスワード-8-50");
             }
-
         }
-
         //Throw exception nếu departmentId không hợp lệ
 
         if (addEmployeeRequest.getDepartmentId() == null) {
@@ -515,7 +510,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 if (!certificationRepo.existsById(Long.parseLong(cer.getCertificationId()))) {
                     throw new EmployeeAddException("ER004-資格");
                 }
-
             });
         }
 
@@ -534,11 +528,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmployeeNameKana(addEmployeeRequest.getEmployeeNameKana());
         employee.setEmployeeTelephone(addEmployeeRequest.getEmployeeTelephone());
 
-
         List<EmployeeCertification> employeeCertificationList = new ArrayList<>();
         //kiểm tra xem employee có certification không
         if (addEmployeeRequest.getCertifications().size() > 0) {
-
             for (EmployeeCertificationReq e : addEmployeeRequest.getCertifications()) {
                 EmployeeCertification employeeCertification = new EmployeeCertification();
                 Certification certification = new Certification();
@@ -555,8 +547,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employeeCertificationList.size()>0){
             employeeCertificationList.forEach(employeeCertificationRepo::save);
         }
-
-
         return editEmployee;
     }
 
@@ -653,7 +643,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeAddException("ER005-失効日-yyyy/MM/dd");
 
         }
-
         return EmployeeCertification.builder()
                 .certification(certification)
                 .startDate(startDate)
@@ -697,7 +686,6 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @return EmployeeCertificationDTO thông tin của chứng chỉ
      */
     public EmployeeCertificationDTO mapToEmployeeCertificationDTO(EmployeeCertification employeeCertification) {
-
         return EmployeeCertificationDTO.builder()
                 .certificationId(employeeCertification.getCertification().getCertificationId())
                 .certificationStartDate(employeeCertification.getStartDate())
@@ -706,9 +694,4 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
-
-
-
-
-
 }

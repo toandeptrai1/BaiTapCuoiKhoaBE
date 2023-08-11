@@ -43,12 +43,12 @@ public class EmployeeController {
      * @return listEmployee danh sách Employee
      */
     @GetMapping("")
-    public EmployeeResponse listEmployee(@RequestParam(required = false,defaultValue = "") String employee_name,
+    public EmployeeResponse listEmployee(@RequestParam(required = false, defaultValue = "") String employee_name,
                                          @RequestParam(required = false) String department_id,
-                                         @RequestParam(required = false,defaultValue = "ASC") String ord_employee_name,
-                                         @RequestParam(required = false,defaultValue = "ASC") String ord_end_date,
-                                         @RequestParam(required = false,defaultValue = "0") String offset, @RequestParam(required = false,defaultValue = "5") String limit,
-                                         @RequestParam(required = false,defaultValue = "ASC") String ord_certification_name
+                                         @RequestParam(required = false, defaultValue = "ASC") String ord_employee_name,
+                                         @RequestParam(required = false, defaultValue = "ASC") String ord_end_date,
+                                         @RequestParam(required = false, defaultValue = "0") String offset, @RequestParam(required = false, defaultValue = "5") String limit,
+                                         @RequestParam(required = false, defaultValue = "ASC") String ord_certification_name
             , HttpServletRequest request) {
 
         //Xử lý các ngoại lệ
@@ -99,6 +99,7 @@ public class EmployeeController {
     /**
      * Xử lý gọi lại phương thức add Employee từ EmployeeService
      * và trả về api
+     *
      * @param employee Dữ liệu của employee cần thêm
      * @return
      */
@@ -125,22 +126,24 @@ public class EmployeeController {
     /**
      * Xử lý việc gọi phương thức getEmployeeById từ service và
      * trả về api Employee vừa tìm được
+     *
      * @param employeeId employeeId cần tìm
      * @return api chứa thông tin employee vùa tìm được
      */
     @GetMapping("/{employeeId}")
-    public ResponseEntity<EmployeeGetByIDResponse> getEmployee(@PathVariable Long employeeId){
+    public ResponseEntity<EmployeeGetByIDResponse> getEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok().body(employeeService.getEmployeeById(employeeId));
     }
 
     /**
      * Xử lý việc gọi phương thức deleteEmployee từ service và
      * trả về api chứa id của employee vừa xoá
+     *
      * @param employeeId employeeId cần xoá
      * @return api chứa id của employee vừa xoá
      */
     @DeleteMapping("/{employeeDelId}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable(name = "employeeDelId") Long employeeId){
+    public ResponseEntity<?> deleteEmployee(@PathVariable(name = "employeeDelId") Long employeeId) {
         Map<String, Object> apiResponse = new HashMap<>();
         apiResponse.put("code", 200);
         apiResponse.put("employeeId", employeeService.deleteEmployee(employeeId));
@@ -155,12 +158,12 @@ public class EmployeeController {
     /**
      * Xử lý gọi lại phương thức edit Employee từ EmployeeService
      * và trả về api
+     *
      * @param employee Dữ liệu của employee cần thêm
      * @return
      */
     @PutMapping("/edit")
     public ResponseEntity<?> editEmployee(@RequestBody AddEmployeeRequest employee) {
-
         if (employee.getCertifications() == null) {
             employee.setCertifications(new ArrayList<>());
         }
@@ -173,10 +176,6 @@ public class EmployeeController {
         message.put("code", "MSG001");
         message.put("prams", params);
         apiResponse.put("message", message);
-
         return ResponseEntity.ok().body(apiResponse);
-
     }
-
-
 }
