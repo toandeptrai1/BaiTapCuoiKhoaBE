@@ -304,7 +304,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employeeBirthDate(employee.getEmployeeBirthDate())
                 .employeeLoginId(employee.getEmployeeLoginId())
                 .employeeNameKana(employee.getEmployeeNameKana())
-                .employeeLoginPassword(employee.getEmployeeLoginPassword())
                 .departmentId(employee.getDepartment().getDepartmentId())
                 .departmentName(employee.getDepartment().getDepartmentName())
                 .build();
@@ -691,7 +690,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .certificationStartDate(employeeCertification.getStartDate())
                 .certificationEndDate(employeeCertification.getEndDate())
                 .employeeCertificationScore(employeeCertification.getScore())
-                .certificationName(employeeCertification.getCertification().getCertificationName())
                 .build();
     }
 }

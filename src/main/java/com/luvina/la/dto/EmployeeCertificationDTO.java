@@ -29,6 +29,6 @@ public class EmployeeCertificationDTO {
     @JsonFormat(pattern = "yyyy/MM/dd")
     private Date certificationEndDate;
     private Long employeeCertificationScore;
-    private String certificationName;
+
 
 }
