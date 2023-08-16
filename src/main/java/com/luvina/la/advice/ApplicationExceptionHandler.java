@@ -9,6 +9,8 @@ import com.luvina.la.exception.EmployeeAddException;
 import com.luvina.la.exception.OrdValueInvalid;
 import com.luvina.la.exception.PageSizeException;
 import com.luvina.la.payload.ErrorResponse;
+import org.hibernate.exception.JDBCConnectionException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.net.ConnectException;
 import java.util.*;
 
 /**
@@ -158,6 +161,21 @@ public class ApplicationExceptionHandler {
 
         msg.put("code","ER001");
         msg.put("params",List.of("ID"));
+        ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
+        return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    /**
+     *Xử lý ngoại lệ khi khi không kết nối được tới DB
+     * @param ex Đối tượng error
+     * @return api chứa thông tin lỗi
+     */
+    @ExceptionHandler({DataAccessResourceFailureException.class, JDBCConnectionException.class, ConnectException.class})
+    public ResponseEntity<ErrorResponse> handleSystemException(Exception ex){
+
+        Map<String, Object> msg=new HashMap<>();
+
+        msg.put("code","ER023");
+        msg.put("params",List.of());
         ErrorResponse errorResponse=ErrorResponse.builder().code(500).message(msg).build();
         return new ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
