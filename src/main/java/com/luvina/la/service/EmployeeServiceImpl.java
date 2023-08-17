@@ -30,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.luvina.la.config.Constants.*;
+
 
 /**
  * Xử lý gọi lại các phương thức của repository và xử lý phần logic liên quan đến
@@ -45,6 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final CertificationRepository certificationRepo;
     private final EmployeeCertificationRepo employeeCertificationRepo;
     private final PasswordEncoder passwordEncoder;
+
     /**
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
      *
@@ -65,20 +68,20 @@ public class EmployeeServiceImpl implements EmployeeService {
             Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
                     .orElseThrow();
             list = employeeRepo.findByEmployeeNameAndDepartmentIdSort(employeeRequest.getEmployee_name()
-                    ,Long.valueOf(employeeRequest.getDepartment_id()),pageable,
-                    employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                    , Long.valueOf(employeeRequest.getDepartment_id()), pageable,
+                    employeeRequest.getOrd_employee_name(), employeeRequest.getOrd_certification_name(),
                     employeeRequest.getOrd_end_date());
         } else if ((employeeRequest.getEmployee_name() != null && !employeeRequest.getEmployee_name().equals(""))
                 || (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals(""))) {
             if (employeeRequest.getDepartment_id() != null && !employeeRequest.getDepartment_id().equals("")) {
                 Department department = departmentRepo.findById(Long.valueOf(employeeRequest.getDepartment_id()))
                         .orElseThrow();
-                list = employeeRepo.findByDepartmentIdSort(Long.valueOf(employeeRequest.getDepartment_id()),pageable,
-                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                list = employeeRepo.findByDepartmentIdSort(Long.valueOf(employeeRequest.getDepartment_id()), pageable,
+                        employeeRequest.getOrd_employee_name(), employeeRequest.getOrd_certification_name(),
                         employeeRequest.getOrd_end_date());
             } else {
-                list = employeeRepo.findByEmployeeNameSort(employeeRequest.getEmployee_name(),pageable,
-                        employeeRequest.getOrd_employee_name(),employeeRequest.getOrd_certification_name(),
+                list = employeeRepo.findByEmployeeNameSort(employeeRequest.getEmployee_name(), pageable,
+                        employeeRequest.getOrd_employee_name(), employeeRequest.getOrd_certification_name(),
                         employeeRequest.getOrd_end_date());
             }
 
@@ -86,7 +89,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             list = employeeRepo.findAllAndSort(
                     employeeRequest.getOrd_employee_name(),
                     employeeRequest.getOrd_certification_name(),
-                    employeeRequest.getOrd_end_date(),pageable);
+                    employeeRequest.getOrd_end_date(), pageable);
         }
 
 
@@ -111,34 +114,34 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee addemployee(AddEmployeeRequest addEmployeeRequest) {
         //Throw exception nếu EmployeeLoginId không hợp lệ
         if (addEmployeeRequest == null) {
-            throw new EmployeeAddException("ER001-アカウント名");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_LOGINID);
         } else if (addEmployeeRequest.getEmployeeLoginId().length() > 50) {
-            throw new EmployeeAddException("ER006-アカウント名");
+            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_LOGINID);
         } else if (!addEmployeeRequest.getEmployeeLoginId().matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
-            throw new EmployeeAddException("ER019-アカウント名");
+            throw new EmployeeAddException(ER019+"-"+LABEL_EMP_LOGINID);
         } else if (employeeRepo.findByEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId()).isPresent()) {
-            throw new EmployeeAddException("ER003-アカウント名");
+            throw new EmployeeAddException(ER003+"-"+LABEL_EMP_LOGINID);
         }
 
         //Throw exception nếu employeeName không hợp lệ
         if (addEmployeeRequest.getEmployeeName() == null || addEmployeeRequest.getEmployeeName().equals("")) {
-            throw new EmployeeAddException("ER001-氏名");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_NAME);
         } else if (addEmployeeRequest.getEmployeeName().length() > 125) {
-            throw new EmployeeAddException("ER006-氏名");
+            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_NAME);
         }
 
         //Throw exception nếu employeeNameKana không hợp lệ
         if (addEmployeeRequest.getEmployeeNameKana() == null || addEmployeeRequest.getEmployeeNameKana().equals("")) {
-            throw new EmployeeAddException("ER001-カタカナ氏名");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_NAMEKANA);
         } else if (addEmployeeRequest.getEmployeeNameKana().length() > 125) {
-            throw new EmployeeAddException("ER006-カタカナ氏名");
+            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_NAMEKANA);
         } else if (!addEmployeeRequest.getEmployeeNameKana().matches("[ぁ-んァ-ン一-龯々〆〤ー・｜｡-ﾟ]+")) {
-            throw new EmployeeAddException("ER009-カタカナ氏名");
+            throw new EmployeeAddException(ER009+"-"+LABEL_EMP_NAMEKANA);
         }
 
         //Throw exception nếu employeeBirthDate không hợp lệ
         if (addEmployeeRequest.getEmployeeBirthDate() == null || addEmployeeRequest.getEmployeeBirthDate().equals("")) {
-            throw new EmployeeAddException("ER001-カタカナ氏名");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_BIRTHDATE);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -146,51 +149,51 @@ public class EmployeeServiceImpl implements EmployeeService {
         Date employeeBirdthDate;
 
         if (!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())) {
-            throw new EmployeeAddException("ER011-生年月日");
+            throw new EmployeeAddException(ER011+"-"+LABEL_EMP_BIRTHDATE);
         }
         try {
             employeeBirdthDate = sdf.parse(addEmployeeRequest.getEmployeeBirthDate());
         } catch (ParseException e) {
-            throw new EmployeeAddException("ER005-生年月日-yyyy/MM/dd");
+            throw new EmployeeAddException(ER005+"-"+LABEL_EMP_BIRTHDATE+"-"+"yyyy/MM/dd");
         }
 
 
         //Throw exception nếu employeeEmail không hợp lệ
         if (addEmployeeRequest.getEmployeeEmail() == null || addEmployeeRequest.getEmployeeEmail().equals("")) {
-            throw new EmployeeAddException("ER001-メールアドレス");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_EMAIL);
         } else if (addEmployeeRequest.getEmployeeEmail().length() > 125) {
-            throw new EmployeeAddException("ER006-メールアドレス");
+            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_EMAIL);
         }
         //Throw exception nếu employeeTelephone không hợp lệ
         if (addEmployeeRequest.getEmployeeTelephone() == null || addEmployeeRequest.getEmployeeTelephone().equals("")) {
-            throw new EmployeeAddException("ER001-電話番号");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_PHONE);
         } else if (addEmployeeRequest.getEmployeeTelephone().length() > 50) {
-            throw new EmployeeAddException("ER006-電話番号");
+            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_PHONE);
         } else if (!addEmployeeRequest.getEmployeeTelephone().matches("[a-zA-Z0-9!-/:-@\\\\\\[-`{-~]+")) {
-            throw new EmployeeAddException("ER008-電話番号");
+            throw new EmployeeAddException(ER008+"-"+LABEL_EMP_PHONE);
         }
 
         //Throw exception nếu employeeLoginPassword không hợp lệ
         if (addEmployeeRequest.getEmployeeLoginPassword() == null || addEmployeeRequest.getEmployeeLoginPassword()
                 .equals("")) {
-            throw new EmployeeAddException("ER001-パスワード");
+            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_PASSWORD);
         } else if (addEmployeeRequest.getEmployeeLoginPassword().length() > 50
                 || addEmployeeRequest.getEmployeeLoginPassword().length() < 8) {
-            throw new EmployeeAddException("ER007-パスワード-8-50");
+            throw new EmployeeAddException(ER007+"-"+LABEL_EMP_PASSWORD+"-8-50");
         }
         //Throw exception nếu departmentId không hợp lệ
 
         if (addEmployeeRequest.getDepartmentId() == null) {
-            throw new EmployeeAddException("ER002-グループ");
+            throw new EmployeeAddException(ER002+"-"+LABEL_EMP_DEPARTMENT);
         }
         Long departId;
         try {
             departId = Long.parseLong(addEmployeeRequest.getDepartmentId());
         } catch (NumberFormatException ex) {
-            throw new EmployeeAddException("ER0018-グループ");
+            throw new EmployeeAddException(ER018+"-"+LABEL_EMP_DEPARTMENT);
         }
         if (departId <= 0) {
-            throw new EmployeeAddException("ER0018-グループ");
+            throw new EmployeeAddException(ER018+"-"+LABEL_EMP_DEPARTMENT);
         }
 
         //Throw exception nếu Certifications không hợp lệ
@@ -310,7 +313,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //Kiểm tra xem có certification không
         if (employee.getEmployeeCertification().size() > 0) {
             employeeGetByIDResponse.setCertifications(employee.getEmployeeCertification().stream()
-                    .sorted(Comparator.comparing(cer->cer.getCertification().getCertificationLevel())).toList()
+                    .sorted(Comparator.comparing(cer -> cer.getCertification().getCertificationLevel())).toList()
                     .stream().map(this::mapToEmployeeCertificationDTO).collect(Collectors.toList()));
         } else {
             employeeGetByIDResponse.setCertifications(List.of());
@@ -320,6 +323,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * Xử lý việc xoá 1 employee theo id của employee
+     *
      * @param employeeId id của employee cần xoá
      * @return employeeId id của employee
      */
@@ -327,13 +331,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public Long deleteEmployee(Long employeeId) {
         //Kiểm tra xem có tồn tại employee có id này trong db không
-        Employee emp=employeeRepo.findByEmployeeId(employeeId).orElseThrow(()->new EmployeeAddException("ER014-ID"));
+        Employee emp = employeeRepo.findByEmployeeId(employeeId).orElseThrow(() -> new EmployeeAddException("ER014-ID"));
         employeeRepo.delete(emp);
         return employeeId;
     }
 
     /**
      * Xử lý việc update 1 employee
+     *
      * @param addEmployeeRequest
      * @return employee thông tin của employee vừa update được
      */
@@ -341,18 +346,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public Employee editEmployee(AddEmployeeRequest addEmployeeRequest) {
         //Throw exception nếu EmployeeId không hợp lệ
-        if(addEmployeeRequest.getEmployeeId()==null){
+        if (addEmployeeRequest.getEmployeeId() == null) {
             throw new EmployeeAddException("ER001-ID");
         }
-        Employee employee=employeeRepo.findByEmployeeId(addEmployeeRequest.getEmployeeId())
-                .orElseThrow(()->new EmployeeAddException("ER013-ID"));
+        Employee employee = employeeRepo.findByEmployeeId(addEmployeeRequest.getEmployeeId())
+                .orElseThrow(() -> new EmployeeAddException("ER013-ID"));
 
 
         //Throw exception nếu EmployeeLoginId không hợp lệ
         if (addEmployeeRequest.getEmployeeLoginId() == null) {
             throw new EmployeeAddException("ER001-アカウント名");
         }
-        if(!addEmployeeRequest.getEmployeeLoginId().equals(employee.getEmployeeLoginId())){
+        if (!addEmployeeRequest.getEmployeeLoginId().equals(employee.getEmployeeLoginId())) {
             if (addEmployeeRequest.getEmployeeLoginId().length() > 50) {
                 throw new EmployeeAddException("ER006-アカウント名");
             } else if (!addEmployeeRequest.getEmployeeLoginId().matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
@@ -418,12 +423,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (addEmployeeRequest.getEmployeeLoginPassword() == null) {
             throw new EmployeeAddException("ER001-パスワード");
         }
-        if( addEmployeeRequest.getEmployeeLoginPassword().equals("")){
+        if (addEmployeeRequest.getEmployeeLoginPassword().equals("")) {
             addEmployeeRequest.setEmployeeLoginPassword(employee.getEmployeeLoginPassword());
 
         }
-        if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
-           if ((addEmployeeRequest.getEmployeeLoginPassword().length() > 50
+        if (!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())) {
+            if ((addEmployeeRequest.getEmployeeLoginPassword().length() > 50
                     || addEmployeeRequest.getEmployeeLoginPassword().length() < 8)) {
                 throw new EmployeeAddException("ER007-パスワード-8-50");
             }
@@ -437,10 +442,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             departId = Long.parseLong(addEmployeeRequest.getDepartmentId());
         } catch (NumberFormatException ex) {
-            throw new EmployeeAddException("ER0018-グループ");
+            throw new EmployeeAddException("ER018-グループ");
         }
         if (departId <= 0) {
-            throw new EmployeeAddException("ER0018-グループ");
+            throw new EmployeeAddException("ER018-グループ");
         }
         //Kiểm tra xem có department trong db không
         Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
@@ -513,7 +518,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //Mã hoá password nếu password khác
-        if(!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())){
+        if (!addEmployeeRequest.getEmployeeLoginPassword().equals(employee.getEmployeeLoginPassword())) {
             employee.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest
                     .getEmployeeLoginPassword()
             ));
@@ -543,7 +548,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeCertificationRepo.deleteByEmployeeEmployeeId(editEmployee.getEmployeeId());
 
         //Lưu các certification
-        if(employeeCertificationList.size()>0){
+        if (employeeCertificationList.size() > 0) {
             employeeCertificationList.forEach(employeeCertificationRepo::save);
         }
         return editEmployee;
@@ -572,7 +577,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //Kiểm tra xem certification không
         if (!employeeCertifications.isEmpty()) {
             EmployeeCertification firstCertification = employeeCertifications.stream()
-                    .sorted(Comparator.comparing(cer->cer.getCertification().getCertificationLevel())).toList().get(0);
+                    .sorted(Comparator.comparing(cer -> cer.getCertification().getCertificationLevel())).toList().get(0);
             builder.certificationName(firstCertification.getCertification().getCertificationName())
                     .score(firstCertification.getScore())
                     .endDate(firstCertification.getEndDate());
