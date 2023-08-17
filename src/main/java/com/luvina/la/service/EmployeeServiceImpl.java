@@ -201,24 +201,24 @@ public class EmployeeServiceImpl implements EmployeeService {
             addEmployeeRequest.getCertifications().forEach(cer -> {
                 //Throw exception nếu CertificationStartDate không hợp lệ
                 if (cer.getCertificationStartDate() == null || cer.getCertificationStartDate().equals("")) {
-                    throw new EmployeeAddException("ER001-資格交付日");
+                    throw new EmployeeAddException(ER001+"-"+LABEL_CER_START_DATE);
                 }
                 Date endDate;
                 Date startDate;
                 if (!checkDateValid(cer.getCertificationStartDate())) {
-                    throw new EmployeeAddException("ER011-資格交付日");
+                    throw new EmployeeAddException(ER011+"-"+LABEL_CER_START_DATE);
                 }
                 try {
                     startDate = sdf.parse(cer.getCertificationStartDate());
                 } catch (ParseException e) {
-                    throw new EmployeeAddException("ER005-資格交付日-yyyy/MM/dd");
+                    throw new EmployeeAddException(ER005+"-"+LABEL_CER_START_DATE+"-yyyy/MM/dd");
                 }
                 ///Throw exception nếu CertificationEndDate không hợp lệ
                 if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
-                    throw new EmployeeAddException("ER001-失効日");
+                    throw new EmployeeAddException(ER001+"-"+LABEL_CER_END_DATE);
                 }
                 if (!checkDateValid(cer.getCertificationEndDate())) {
-                    throw new EmployeeAddException("ER011-失効日");
+                    throw new EmployeeAddException(ER011+"-"+LABEL_CER_END_DATE);
                 }
                 try {
                     endDate = sdf.parse(cer.getCertificationEndDate());
