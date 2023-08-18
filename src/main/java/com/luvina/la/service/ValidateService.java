@@ -3,7 +3,10 @@
  * EmployeeServiceImpl.java, June 30, 2023 Toannq
  */
 package com.luvina.la.service;
+import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.EmployeeAddException;
+import com.luvina.la.payload.EmployeeCertificationReq;
+import com.luvina.la.repository.CertificationRepository;
 import com.luvina.la.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,19 @@ import static com.luvina.la.config.Constants.LABEL_EMP_LOGINID;
 public class ValidateService {
 
     private final EmployeeRepository employeeRepo;
+    private final CertificationRepository certificationRepo;
+    /**
+     * Xử lý validate employeeId
+     * @param employeeId cần validate
+     */
+    public void validateEmployeeId(Long employeeId){
+        //Throw exception nếu EmployeeId không hợp lệ
+        if (employeeId == null) {
+            throw new EmployeeAddException("ER001-ID");
+        }
+        Employee employee = employeeRepo.findByEmployeeId(employeeId)
+        .orElseThrow(() -> new EmployeeAddException("ER013-ID"));
+    }
 
     /**
      * Xử lý validate employeeLoginId
@@ -146,6 +162,74 @@ public class ValidateService {
         if (departId <= 0) {
             throw new EmployeeAddException(ER018 + "-" + LABEL_EMP_DEPARTMENT);
         }
+    }
+    /**
+     * Xử lý validate certificationStartDate
+     * @param cer certification  cần validate
+     */
+    public void validateCertification(EmployeeCertificationReq cer){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        sdf.setLenient(false);
+        //Throw exception nếu CertificationStartDate không hợp lệ
+        if (cer.getCertificationStartDate() == null || cer.getCertificationStartDate().equals("")) {
+            throw new EmployeeAddException(ER001 + "-" + LABEL_CER_START_DATE);
+        }
+        Date endDate;
+        Date startDate;
+        if (!checkDateValid(cer.getCertificationStartDate())) {
+            throw new EmployeeAddException(ER011 + "-" + LABEL_CER_START_DATE);
+        }
+        try {
+            startDate = sdf.parse(cer.getCertificationStartDate());
+        } catch (ParseException e) {
+            throw new EmployeeAddException(ER005 + "-" + LABEL_CER_START_DATE + "-yyyy/MM/dd");
+        }
+        ///Throw exception nếu CertificationEndDate không hợp lệ
+        if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
+            throw new EmployeeAddException(ER001 + "-" + LABEL_CER_END_DATE);
+        }
+        if (!checkDateValid(cer.getCertificationEndDate())) {
+            throw new EmployeeAddException(ER011 + "-" + LABEL_CER_END_DATE);
+        }
+        try {
+            endDate = sdf.parse(cer.getCertificationEndDate());
+            if (endDate.before(startDate) || endDate.equals(startDate)) {
+                throw new EmployeeAddException(ER012);
+            }
+        } catch (ParseException e) {
+            throw new EmployeeAddException(ER005 + "-" + LABEL_CER_END_DATE + "-yyyy/MM/dd");
+        }
+        ///Throw exception nếu EmployeeCertificationScore không hợp lệ
+        if (cer.getEmployeeCertificationScore() == null || cer.getEmployeeCertificationScore().equals("")) {
+            throw new EmployeeAddException(ER001 + "-" + LABEL_CER_SCORE);
+        }
+        long score;
+        try {
+            score = Long.parseLong(cer.getEmployeeCertificationScore());
+            if (score <= 0) {
+                throw new EmployeeAddException(ER018 + "-" + LABEL_CER_SCORE);
+            }
+        } catch (NumberFormatException ex) {
+            throw new EmployeeAddException(ER018 + "-" + LABEL_CER_SCORE);
+        }
+        //certificationId
+        if (cer.getCertificationId() == null || cer.getCertificationId().equals("")) {
+            throw new EmployeeAddException(ER001 + "-" + LABEL_CER_ID);
+        }
+        long certiId;
+        try {
+            certiId = Long.parseLong(cer.getCertificationId());
+            if (certiId <= 0) {
+                throw new EmployeeAddException(ER018 + "-" + LABEL_CER_ID);
+            }
+        } catch (NumberFormatException ex) {
+            throw new EmployeeAddException(ER018 + "-" + LABEL_CER_ID);
+        }
+        if (!certificationRepo.existsById(Long.parseLong(cer.getCertificationId()))) {
+            throw new EmployeeAddException(ER004 + "-" + LABEL_CER_ID);
+        }
+
     }
 
 
