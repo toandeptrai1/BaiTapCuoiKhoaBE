@@ -47,6 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final CertificationRepository certificationRepo;
     private final EmployeeCertificationRepo employeeCertificationRepo;
     private final PasswordEncoder passwordEncoder;
+    private final ValidateService validateService;
 
     /**
      * Xử lý việc get danh sách employee theo các điều kiện của EmployeeRequest
@@ -113,149 +114,84 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee addemployee(AddEmployeeRequest addEmployeeRequest) {
         //Throw exception nếu EmployeeLoginId không hợp lệ
-        if (addEmployeeRequest == null) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_LOGINID);
-        } else if (addEmployeeRequest.getEmployeeLoginId().length() > 50) {
-            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_LOGINID);
-        } else if (!addEmployeeRequest.getEmployeeLoginId().matches("^[a-zA-Z_][a-zA-Z0-9_]*$")) {
-            throw new EmployeeAddException(ER019+"-"+LABEL_EMP_LOGINID);
-        } else if (employeeRepo.findByEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId()).isPresent()) {
-            throw new EmployeeAddException(ER003+"-"+LABEL_EMP_LOGINID);
-        }
-
+        validateService.validateEmployeeLoginId(addEmployeeRequest.getEmployeeLoginId());
         //Throw exception nếu employeeName không hợp lệ
-        if (addEmployeeRequest.getEmployeeName() == null || addEmployeeRequest.getEmployeeName().equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_NAME);
-        } else if (addEmployeeRequest.getEmployeeName().length() > 125) {
-            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_NAME);
-        }
-
+        validateService.validateEmployeeName(addEmployeeRequest.getEmployeeName());
         //Throw exception nếu employeeNameKana không hợp lệ
-        if (addEmployeeRequest.getEmployeeNameKana() == null || addEmployeeRequest.getEmployeeNameKana().equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_NAMEKANA);
-        } else if (addEmployeeRequest.getEmployeeNameKana().length() > 125) {
-            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_NAMEKANA);
-        } else if (!addEmployeeRequest.getEmployeeNameKana().matches("[ぁ-んァ-ン一-龯々〆〤ー・｜｡-ﾟ]+")) {
-            throw new EmployeeAddException(ER009+"-"+LABEL_EMP_NAMEKANA);
-        }
-
+        validateService.validateEmployeeNameKana(addEmployeeRequest.getEmployeeNameKana());
         //Throw exception nếu employeeBirthDate không hợp lệ
-        if (addEmployeeRequest.getEmployeeBirthDate() == null || addEmployeeRequest.getEmployeeBirthDate().equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_BIRTHDATE);
-        }
+        validateService.validateEmployeeBirthDate(addEmployeeRequest.getEmployeeBirthDate());
+        //Throw exception nếu employeeEmail không hợp lệ
+        validateService.validateEmployeeEmail(addEmployeeRequest.getEmployeeEmail());
+        //Throw exception nếu employeeTelephone không hợp lệ
+        validateService.validateEmployeePhone(addEmployeeRequest.getEmployeeTelephone());
+        //Throw exception nếu employeeLoginPassword không hợp lệ
+        validateService.validateEmployeeLoginPassword(addEmployeeRequest.getEmployeeLoginPassword());
+        //Throw exception nếu departmentId không hợp lệ
+        validateService.validateDepartmentId(addEmployeeRequest.getDepartmentId());
+        //Throw exception nếu Certifications không hợp lệ
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         sdf.setLenient(false);
-        Date employeeBirdthDate;
-
-        if (!checkDateValid(addEmployeeRequest.getEmployeeBirthDate())) {
-            throw new EmployeeAddException(ER011+"-"+LABEL_EMP_BIRTHDATE);
-        }
-        try {
-            employeeBirdthDate = sdf.parse(addEmployeeRequest.getEmployeeBirthDate());
-        } catch (ParseException e) {
-            throw new EmployeeAddException(ER005+"-"+LABEL_EMP_BIRTHDATE+"-"+"yyyy/MM/dd");
-        }
-
-
-        //Throw exception nếu employeeEmail không hợp lệ
-        if (addEmployeeRequest.getEmployeeEmail() == null || addEmployeeRequest.getEmployeeEmail().equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_EMAIL);
-        } else if (addEmployeeRequest.getEmployeeEmail().length() > 125) {
-            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_EMAIL);
-        }
-        //Throw exception nếu employeeTelephone không hợp lệ
-        if (addEmployeeRequest.getEmployeeTelephone() == null || addEmployeeRequest.getEmployeeTelephone().equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_PHONE);
-        } else if (addEmployeeRequest.getEmployeeTelephone().length() > 50) {
-            throw new EmployeeAddException(ER006+"-"+LABEL_EMP_PHONE);
-        } else if (!addEmployeeRequest.getEmployeeTelephone().matches("[a-zA-Z0-9!-/:-@\\\\\\[-`{-~]+")) {
-            throw new EmployeeAddException(ER008+"-"+LABEL_EMP_PHONE);
-        }
-
-        //Throw exception nếu employeeLoginPassword không hợp lệ
-        if (addEmployeeRequest.getEmployeeLoginPassword() == null || addEmployeeRequest.getEmployeeLoginPassword()
-                .equals("")) {
-            throw new EmployeeAddException(ER001+"-"+LABEL_EMP_PASSWORD);
-        } else if (addEmployeeRequest.getEmployeeLoginPassword().length() > 50
-                || addEmployeeRequest.getEmployeeLoginPassword().length() < 8) {
-            throw new EmployeeAddException(ER007+"-"+LABEL_EMP_PASSWORD+"-8-50");
-        }
-        //Throw exception nếu departmentId không hợp lệ
-
-        if (addEmployeeRequest.getDepartmentId() == null) {
-            throw new EmployeeAddException(ER002+"-"+LABEL_EMP_DEPARTMENT);
-        }
-        Long departId;
-        try {
-            departId = Long.parseLong(addEmployeeRequest.getDepartmentId());
-        } catch (NumberFormatException ex) {
-            throw new EmployeeAddException(ER018+"-"+LABEL_EMP_DEPARTMENT);
-        }
-        if (departId <= 0) {
-            throw new EmployeeAddException(ER018+"-"+LABEL_EMP_DEPARTMENT);
-        }
-
-        //Throw exception nếu Certifications không hợp lệ
         if (addEmployeeRequest.getCertifications().size() > 0) {
             addEmployeeRequest.getCertifications().forEach(cer -> {
                 //Throw exception nếu CertificationStartDate không hợp lệ
                 if (cer.getCertificationStartDate() == null || cer.getCertificationStartDate().equals("")) {
-                    throw new EmployeeAddException(ER001+"-"+LABEL_CER_START_DATE);
+                    throw new EmployeeAddException(ER001 + "-" + LABEL_CER_START_DATE);
                 }
                 Date endDate;
                 Date startDate;
                 if (!checkDateValid(cer.getCertificationStartDate())) {
-                    throw new EmployeeAddException(ER011+"-"+LABEL_CER_START_DATE);
+                    throw new EmployeeAddException(ER011 + "-" + LABEL_CER_START_DATE);
                 }
                 try {
                     startDate = sdf.parse(cer.getCertificationStartDate());
                 } catch (ParseException e) {
-                    throw new EmployeeAddException(ER005+"-"+LABEL_CER_START_DATE+"-yyyy/MM/dd");
+                    throw new EmployeeAddException(ER005 + "-" + LABEL_CER_START_DATE + "-yyyy/MM/dd");
                 }
                 ///Throw exception nếu CertificationEndDate không hợp lệ
                 if (cer.getCertificationEndDate() == null || cer.getCertificationEndDate().equals("")) {
-                    throw new EmployeeAddException(ER001+"-"+LABEL_CER_END_DATE);
+                    throw new EmployeeAddException(ER001 + "-" + LABEL_CER_END_DATE);
                 }
                 if (!checkDateValid(cer.getCertificationEndDate())) {
-                    throw new EmployeeAddException(ER011+"-"+LABEL_CER_END_DATE);
+                    throw new EmployeeAddException(ER011 + "-" + LABEL_CER_END_DATE);
                 }
                 try {
                     endDate = sdf.parse(cer.getCertificationEndDate());
                     if (endDate.before(startDate) || endDate.equals(startDate)) {
-                        throw new EmployeeAddException("ER012");
+                        throw new EmployeeAddException(ER012);
                     }
                 } catch (ParseException e) {
-                    throw new EmployeeAddException("ER005-失効日-yyyy/MM/dd");
+                    throw new EmployeeAddException(ER005 + "-" + LABEL_CER_END_DATE + "-yyyy/MM/dd");
                 }
                 ///Throw exception nếu EmployeeCertificationScore không hợp lệ
                 if (cer.getEmployeeCertificationScore() == null || cer.getEmployeeCertificationScore().equals("")) {
-                    throw new EmployeeAddException("ER001-点数");
+                    throw new EmployeeAddException(ER001 + "-" + LABEL_CER_SCORE);
                 }
                 long score;
                 try {
                     score = Long.parseLong(cer.getEmployeeCertificationScore());
                     if (score <= 0) {
-                        throw new EmployeeAddException("ER018-点数");
+                        throw new EmployeeAddException(ER018 + "-" + LABEL_CER_SCORE);
                     }
                 } catch (NumberFormatException ex) {
-                    throw new EmployeeAddException("ER018-点数");
+                    throw new EmployeeAddException(ER018 + "-" + LABEL_CER_SCORE);
                 }
                 //certificationId
                 if (cer.getCertificationId() == null || cer.getCertificationId().equals("")) {
-                    throw new EmployeeAddException("ER001-資格");
+                    throw new EmployeeAddException(ER001 + "-" + LABEL_CER_ID);
                 }
                 long certiId;
                 try {
                     certiId = Long.parseLong(cer.getCertificationId());
                     if (certiId <= 0) {
-                        throw new EmployeeAddException("ER018-資格");
+                        throw new EmployeeAddException(ER018 + "-" + LABEL_CER_ID);
                     }
                 } catch (NumberFormatException ex) {
-                    throw new EmployeeAddException("ER018-資格");
+                    throw new EmployeeAddException(ER018 + "-" + LABEL_CER_ID);
                 }
                 if (!certificationRepo.existsById(Long.parseLong(cer.getCertificationId()))) {
-                    throw new EmployeeAddException("ER004-資格");
+                    throw new EmployeeAddException(ER004 + "-" + LABEL_CER_ID);
                 }
 
             });
@@ -265,7 +201,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         addEmployeeRequest.setEmployeeLoginPassword(passwordEncoder.encode(addEmployeeRequest.getEmployeeLoginPassword()
         ));
         Department department = departmentRepo.findById(Long.parseLong(addEmployeeRequest.getDepartmentId()))
-                .orElseThrow(() -> new EmployeeAddException("ER004-グループ"));
+                .orElseThrow(() -> new EmployeeAddException(ER004 + "-" + LABEL_EMP_DEPARTMENT));
         Employee employee = mapToAddemployeeRequestToEmployee(addEmployeeRequest, department);
         Employee addEmployee = employeeRepo.save(employee);
         List<EmployeeCertification> employeeCertificationList = new ArrayList<>();
@@ -297,7 +233,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeGetByIDResponse getEmployeeById(Long employeeId) {
         //Get employee từ db nếu không có sẽ throw 1 exception
         Employee employee = employeeRepo.findByEmployeeId(employeeId).orElseThrow(() ->
-                new EmployeeAddException("ER013-ID"));
+                new EmployeeAddException(ER013 + "-" + LABEL_ID));
         EmployeeGetByIDResponse employeeGetByIDResponse = EmployeeGetByIDResponse.builder()
                 .code(200L)
                 .employeeId(employee.getEmployeeId())
@@ -331,7 +267,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public Long deleteEmployee(Long employeeId) {
         //Kiểm tra xem có tồn tại employee có id này trong db không
-        Employee emp = employeeRepo.findByEmployeeId(employeeId).orElseThrow(() -> new EmployeeAddException("ER014-ID"));
+        Employee emp = employeeRepo.findByEmployeeId(employeeId).orElseThrow(() -> new EmployeeAddException(ER014 + "-"
+                + LABEL_ID));
         employeeRepo.delete(emp);
         return employeeId;
     }

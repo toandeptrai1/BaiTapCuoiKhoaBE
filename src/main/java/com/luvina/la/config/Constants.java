@@ -12,13 +12,16 @@ public class Constants {
     public static final String ER001 = "ER001";
     public static final String ER002 = "ER002";
     public static final String ER003 = "ER003";
+    public static final String ER004 = "ER004";
     public static final String ER005 = "ER005";
     public static final String ER006 = "ER006";
     public static final String ER007 = "ER007";
     public static final String ER008 = "ER008";
     public static final String ER009 = "ER009";
     public static final String ER011 = "ER011";
+    public static final String ER012 = "ER012";
     public static final String ER013 = "ER013";
+    public static final String ER014 = "ER014";
     public static final String ER018 = " ER018";
     public static final String ER019 = " ER019";
 
