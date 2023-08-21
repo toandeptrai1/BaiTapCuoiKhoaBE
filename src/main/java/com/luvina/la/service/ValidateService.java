@@ -3,10 +3,13 @@
  * EmployeeServiceImpl.java, June 30, 2023 Toannq
  */
 package com.luvina.la.service;
+
+import com.luvina.la.entity.Department;
 import com.luvina.la.entity.Employee;
 import com.luvina.la.exception.EmployeeAddException;
 import com.luvina.la.payload.EmployeeCertificationReq;
 import com.luvina.la.repository.CertificationRepository;
+import com.luvina.la.repository.DepartmentRepository;
 import com.luvina.la.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +21,10 @@ import java.util.TimeZone;
 
 import static com.luvina.la.config.Constants.*;
 import static com.luvina.la.config.Constants.LABEL_EMP_LOGINID;
+
 /**
  * Xử lý validate các thuộc tính của employee
+ *
  * @author Toannq
  */
 @Service
@@ -28,24 +33,28 @@ public class ValidateService {
 
     private final EmployeeRepository employeeRepo;
     private final CertificationRepository certificationRepo;
+    private final DepartmentRepository departmentRepo;
+
     /**
      * Xử lý validate employeeId
+     *
      * @param employeeId cần validate
      */
-    public void validateEmployeeId(Long employeeId){
+    public void validateEmployeeId(Long employeeId) {
         //Throw exception nếu EmployeeId không hợp lệ
         if (employeeId == null) {
             throw new EmployeeAddException("ER001-ID");
         }
         Employee employee = employeeRepo.findByEmployeeId(employeeId)
-        .orElseThrow(() -> new EmployeeAddException("ER013-ID"));
+                .orElseThrow(() -> new EmployeeAddException("ER013-ID"));
     }
 
     /**
      * Xử lý validate employeeLoginId
+     *
      * @param employeeLoginId cần validate
      */
-    public void validateEmployeeLoginId(String employeeLoginId){
+    public void validateEmployeeLoginId(String employeeLoginId) {
         //Throw exception nếu EmployeeLoginId không hợp lệ
         if (employeeLoginId == null) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_LOGINID);
@@ -57,11 +66,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER003 + "-" + LABEL_EMP_LOGINID);
         }
     }
+
     /**
      * Xử lý validate employeeName
+     *
      * @param employeeName cần validate
      */
-    public void validateEmployeeName(String employeeName){
+    public void validateEmployeeName(String employeeName) {
         //Throw exception nếu employeeName không hợp lệ
         if (employeeName == null || employeeName.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_NAME);
@@ -69,11 +80,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER006 + "-" + LABEL_EMP_NAME);
         }
     }
+
     /**
      * Xử lý validate employeeNameKana
+     *
      * @param employeeNameKana cần validate
      */
-    public void validateEmployeeNameKana(String employeeNameKana){
+    public void validateEmployeeNameKana(String employeeNameKana) {
         //Throw exception nếu EmployeeNameKana không hợp lệ
         if (employeeNameKana == null || employeeNameKana.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_NAMEKANA);
@@ -83,11 +96,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER009 + "-" + LABEL_EMP_NAMEKANA);
         }
     }
+
     /**
      * Xử lý validate employeeEmail
+     *
      * @param employeeEmail cần validate
      */
-    public void validateEmployeeEmail(String employeeEmail){
+    public void validateEmployeeEmail(String employeeEmail) {
         //Throw exception nếu EmployeeEmail không hợp lệ
         if (employeeEmail == null || employeeEmail.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_EMAIL);
@@ -95,11 +110,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER006 + "-" + LABEL_EMP_EMAIL);
         }
     }
+
     /**
      * Xử lý validate employeePhone
+     *
      * @param employeePhone cần validate
      */
-    public void validateEmployeePhone(String employeePhone){
+    public void validateEmployeePhone(String employeePhone) {
         //Throw exception nếu employeePhone không hợp lệ
         if (employeePhone == null || employeePhone.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_PHONE);
@@ -109,11 +126,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER008 + "-" + LABEL_EMP_PHONE);
         }
     }
+
     /**
      * Xử lý validate employeeBirthDate
+     *
      * @param employeeBirthDate cần validate
      */
-    public void validateEmployeeBirthDate(String employeeBirthDate){
+    public void validateEmployeeBirthDate(String employeeBirthDate) {
         //Throw exception nếu employeeBirthDate không hợp lệ
         if (employeeBirthDate == null || employeeBirthDate.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_BIRTHDATE);
@@ -132,11 +151,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER005 + "-" + LABEL_EMP_BIRTHDATE + "-" + "yyyy/MM/dd");
         }
     }
+
     /**
      * Xử lý validate employeeLoginPassword
+     *
      * @param employeeLoginPassword cần validate
      */
-    public void validateEmployeeLoginPassword(String employeeLoginPassword){
+    public void validateEmployeeLoginPassword(String employeeLoginPassword) {
         //Throw exception nếu employeeLoginPassword không hợp lệ
         if (employeeLoginPassword == null || employeeLoginPassword.equals("")) {
             throw new EmployeeAddException(ER001 + "-" + LABEL_EMP_PASSWORD);
@@ -144,11 +165,13 @@ public class ValidateService {
             throw new EmployeeAddException(ER007 + "-" + LABEL_EMP_PASSWORD + "-8-50");
         }
     }
+
     /**
      * Xử lý validate departmentId
+     *
      * @param departmentId cần validate
      */
-    public void validateDepartmentId(String departmentId){
+    public void validateDepartmentId(String departmentId) {
         //Throw exception nếu departmentId không hợp lệ
         if (departmentId == null) {
             throw new EmployeeAddException(ER002 + "-" + LABEL_EMP_DEPARTMENT);
@@ -162,12 +185,17 @@ public class ValidateService {
         if (departId <= 0) {
             throw new EmployeeAddException(ER018 + "-" + LABEL_EMP_DEPARTMENT);
         }
+        //Kiểm tra xem có department trong db không
+        Department department = departmentRepo.findById(Long.parseLong(departmentId))
+                .orElseThrow(() -> new EmployeeAddException("ER004-グループ"));
     }
+
     /**
      * Xử lý validate certificationStartDate
+     *
      * @param cer certification  cần validate
      */
-    public void validateCertification(EmployeeCertificationReq cer){
+    public void validateCertification(EmployeeCertificationReq cer) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         sdf.setLenient(false);
@@ -231,11 +259,6 @@ public class ValidateService {
         }
 
     }
-
-
-
-
-
 
     /**
      * Phương thức kiểm tra ngày có hợp lệ không

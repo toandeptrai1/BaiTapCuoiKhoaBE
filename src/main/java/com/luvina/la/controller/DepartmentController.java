@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Tạo DepartmentController có các phương thức
  * trả về api
+ *
  * @author Toannq
  */
 @RestController
@@ -26,6 +27,7 @@ public class DepartmentController {
 
     /**
      * Trả vè api list department
+     *
      * @return DepartmentResponse
      */
     @GetMapping("")

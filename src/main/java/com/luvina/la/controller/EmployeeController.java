@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+import static com.luvina.la.config.Constants.*;
+
 /**
  * Tạo EmployeeController
  *
@@ -54,35 +56,35 @@ public class EmployeeController {
         //Xử lý các ngoại lệ
         if (ord_employee_name == null || (!ord_employee_name.equalsIgnoreCase("asc")
                 && !ord_employee_name.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ER021");
+            throw new OrdValueInvalid(ER021);
 
         }
         if (ord_certification_name == null || (!ord_certification_name.equalsIgnoreCase("asc")
                 && !ord_certification_name.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ER021");
+            throw new OrdValueInvalid(ER021);
 
         }
         if (ord_end_date == null || (!ord_end_date.equalsIgnoreCase("asc")
                 && !ord_end_date.equalsIgnoreCase("desc"))) {
-            throw new OrdValueInvalid("ER021");
+            throw new OrdValueInvalid(ER021);
 
         }
         try {
             if (Integer.parseInt(limit) < 0) {
-                throw new PageSizeException("ER018-リミット");
+                throw new PageSizeException(ER018 + "-リミット");
             }
 
         } catch (NumberFormatException ex) {
-            throw new PageSizeException("ER018-リミット");
+            throw new PageSizeException(ER018 + "-リミット");
         }
         try {
 
             if (Integer.parseInt(offset) < 0) {
-                throw new PageSizeException("ER018-オフセット");
+                throw new PageSizeException(ER018 + "-オフセット");
             }
 
         } catch (NumberFormatException ex) {
-            throw new PageSizeException("ER018-オフセット");
+            throw new PageSizeException(ER018 + "-オフセット");
         }
         EmployeeRequest employeeRequest = EmployeeRequest.builder()
                 .employee_name(employee_name)

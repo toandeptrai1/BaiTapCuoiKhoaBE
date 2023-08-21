@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Class chứa các thuộc tính của 1 certification
+ *
  * @author Toannq
  */
 @Entity

@@ -28,146 +28,44 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
 
-
+    /**
+     * Get employee by employeeLoginId
+     *
+     * @param employeeLoginId employeeLoginID
+     * @return
+     */
     Optional<Employee> findByEmployeeLoginId(String employeeLoginId);
 
+    /**
+     * Get employee by employeeId
+     *
+     * @param employeeId id của employee
+     * @return Employee
+     */
     Optional<Employee> findByEmployeeId(Long employeeId);
 
     /**
-     * Xử lý việc tìm 1 employee thỏa mãn departmentID and EmployeeName %like%
-     *
-     * @param department   department cần tìm kiếm
-     * @param employeeName employee cần tìm kiếm
-     * @param pageable     đối tượng pageable khai báo page,size,sort dùng để phân trang
-     * @return 1 Page<Employee>
-     */
-    Page<Employee> findByDepartmentOrEmployeeNameContaining(Department department, String employeeName, Pageable pageable);
-
-    /**
-     * Xử lý việc tìm 1 employee thỏa mãn departmentID or EmployeeName %like%
-     *
-     * @param department   department cần tìm kiếm
-     * @param employeeName employee cần tìm kiếm
-     * @param pageable     đối tượng pageable khai báo page,size,sort dùng để phân trang
-     * @return 1 Page<Employee>
-     */
-    Page<Employee> findByDepartmentAndEmployeeNameContaining(Department department, String employeeName, Pageable pageable);
-
-
-    /** Thực hiện: Sort theo sortEmployeeName, sortCertificationName, sortEndDate khi tìm kiếm theo cả employeeName và departmentId
-     * @param employeeName: tìm theo tên nhân viên
-     *  @param departmentId: tìm theo tên nhân viên
-     * @param pageable: để phân trang
-     *  @param sortEmployeeName: để sort theo employeeName
-     *  @param sortCertificationName: để sort theo CertificationName
-     *  @param sortEndDate: để sort theo EndDate
-     */
-    @Query(value = "SELECT e FROM Employee e " +
-            "LEFT JOIN e.department d " +
-            "LEFT JOIN e.employeeCertification ec " +
-            "LEFT JOIN ec.certification c " +
-            "WHERE e.employeeName LIKE %:employeeName% AND " +
-            "d.departmentId = :departmentId " +
-            "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MIN(c2.certificationLevel) " +
-            "    FROM Employee e2 " +
-            "    LEFT JOIN e2.employeeCertification ec2 " +
-            "    LEFT JOIN ec2.certification c2 " +
-            "    WHERE e2.employeeId = e.employeeId" +
-            ")) " +
-            "ORDER BY " +
-            "CASE WHEN :sortEmployeeName = 'ASC' THEN e.employeeName END ASC, " +
-            "CASE WHEN :sortEmployeeName = 'DESC' THEN e.employeeName END DESC, " +
-            "CASE WHEN :sortCertificationName = 'ASC' THEN c.certificationName END ASC, " +
-            "CASE WHEN :sortCertificationName = 'DESC' THEN c.certificationName END DESC, " +
-            "CASE WHEN :sortEndDate = 'ASC' THEN ec.endDate END ASC, " +
-            "CASE WHEN :sortEndDate = 'DESC' THEN ec.endDate END DESC")
-    Page<Employee> findByEmployeeNameAndDepartmentIdSort(String employeeName, Long departmentId, Pageable pageable,
-                                                         @Param("sortEmployeeName") String sortEmployeeName,
-                                                         @Param("sortCertificationName") String sortCertificationName,
-                                                         @Param("sortEndDate") String sortEndDate);
-    /**
-     * Thực hiện: Sort theo sortEmployeeName, sortCertificationName, sortEndDate khi tìm kiếm theo employeeName
-     * @param employeeName: tìm theo tên nhân viên
-     * @param pageable: để phân trang
-     *  @param sortEmployeeName: để sort theo employeeName
-     *  @param sortCertificationName: để sort theo CertificationName
-     *  @param sortEndDate: để sort theo EndDate
-     */
-    @Query(value = "SELECT e FROM Employee e " +
-            "JOIN e.department d " +
-            "LEFT JOIN e.employeeCertification ec " +
-            "LEFT JOIN ec.certification c " +
-            "WHERE e.employeeName LIKE %:employeeName% " +
-            "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MIN(c2.certificationLevel) " +
-            "    FROM Employee e2 " +
-            "    LEFT JOIN e2.employeeCertification ec2 " +
-            "    LEFT JOIN ec2.certification c2 " +
-            "    WHERE e2.employeeId = e.employeeId" +
-            ")) " +
-            "ORDER BY " +
-            "CASE WHEN :sortEmployeeName = 'ASC' THEN e.employeeName END ASC, " +
-            "CASE WHEN :sortEmployeeName = 'DESC' THEN e.employeeName END DESC, " +
-            "CASE WHEN :sortCertificationName = 'ASC' THEN c.certificationName END ASC, " +
-            "CASE WHEN :sortCertificationName = 'DESC' THEN c.certificationName END DESC, " +
-            "CASE WHEN :sortEndDate = 'ASC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END ASC, " +
-            "CASE WHEN :sortEndDate = 'DESC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END DESC")
-    Page<Employee> findByEmployeeNameSort(String employeeName, Pageable pageable,
-                                          @Param("sortEmployeeName") String sortEmployeeName,
-                                          @Param("sortCertificationName") String sortCertificationName,
-                                          @Param("sortEndDate") String sortEndDate);
-
-    /**
-     * Thực hiện: Sort theo sortEmployeeName, sortCertificationName, sortEndDate khi tìm kiếm theo employeeName
-     * @param departmentId: tìm theo departmentId
-     * @param pageable: để phân trang
-     *  @param sortEmployeeName: để sort theo employeeName
-     *  @param sortCertificationName: để sort theo CertificationName
-     *  @param sortEndDate: để sort theo EndDate
-     */
-    @Query(value = "SELECT e FROM Employee e " +
-            "JOIN e.department d " +
-            "LEFT JOIN e.employeeCertification ec " +
-            "LEFT JOIN ec.certification c " +
-            "WHERE (e.department.departmentId = :departmentId OR e.department IS NULL) " +
-            "AND (c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MIN(c2.certificationLevel) " +
-            "    FROM Employee e2 " +
-            "    LEFT JOIN e2.employeeCertification ec2 " +
-            "    LEFT JOIN ec2.certification c2 " +
-            "    WHERE e2.employeeId = e.employeeId" +
-            ")) " +
-            "ORDER BY " +
-            "CASE WHEN :sortEmployeeName = 'ASC' THEN e.employeeName END ASC, " +
-            "CASE WHEN :sortEmployeeName = 'DESC' THEN e.employeeName END DESC, " +
-            "CASE WHEN :sortCertificationName = 'ASC' THEN c.certificationName END ASC, " +
-            "CASE WHEN :sortCertificationName = 'DESC' THEN c.certificationName END DESC, " +
-            "CASE WHEN :sortEndDate = 'ASC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END ASC, " +
-            "CASE WHEN :sortEndDate = 'DESC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END DESC")
-    Page<Employee> findByDepartmentIdSort(Long departmentId, Pageable pageable,
-                                          @Param("sortEmployeeName") String sortEmployeeName,
-                                          @Param("sortCertificationName") String sortCertificationName,
-                                          @Param("sortEndDate") String sortEndDate);
-
-    /**
+     * Lấy ra danh sách employee
      * Thực hiện: Sort theo sortEmployeeName, sortCertificationName, sortEndDate
-     * @param pageable: để phân trang
-     *  @param sortEmployeeName: để sort theo employeeName
-     *  @param sortCertificationName: để sort theo CertificationName
-     *  @param sortEndDate: để sort theo EndDate
+     *
+     * @param pageable:              để phân trang
+     * @param sortEmployeeName:      để sort theo employeeName
+     * @param sortCertificationName: để sort theo CertificationName
+     * @param sortEndDate:           để sort theo EndDate
      */
     @Query(value = "SELECT e FROM Employee e " +
             "LEFT JOIN e.department d " +
             "LEFT JOIN e.employeeCertification ec " +
             "LEFT JOIN ec.certification c " +
-            "WHERE c.certificationLevel IS NULL OR c.certificationLevel = (" +
-            "    SELECT MIN(c2.certificationLevel) " +
-            "    FROM Employee e2 " +
-            "    LEFT JOIN e2.employeeCertification ec2 " +
-            "    LEFT JOIN ec2.certification c2 "+
-            "    WHERE e2.employeeId = e.employeeId" +
-            ") "+
+            "WHERE (:employeeName IS NULL OR e.employeeName LIKE CONCAT('%', :employeeName, '%')) " +
+            "AND (:departmentId IS NULL OR d.departmentId = :departmentId) AND (c.certificationLevel IS NULL OR " +
+            "c.certificationLevel = (" +
+            "SELECT MIN(c2.certificationLevel) " +
+            "FROM Employee e2  " +
+            "LEFT JOIN e2.employeeCertification ec2 " +
+            "LEFT JOIN ec2.certification c2 " +
+            "WHERE e2.employeeId = e.employeeId " +
+            ")) " +
             "ORDER BY " +
             "CASE WHEN :sortEmployeeName = 'ASC' THEN e.employeeName END ASC, " +
             "CASE WHEN :sortEmployeeName = 'DESC' THEN e.employeeName END DESC, " +
@@ -175,10 +73,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
             "CASE WHEN :sortCertificationName = 'DESC' THEN c.certificationName END DESC, " +
             "CASE WHEN :sortEndDate = 'ASC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END ASC, " +
             "CASE WHEN :sortEndDate = 'DESC' THEN COALESCE(ec.endDate, STR_TO_DATE('9999-12-31', '%Y-%m-%d')) END DESC")
-    Page<Employee> findAllAndSort(@Param("sortEmployeeName") String sortEmployeeName,
-                                  @Param("sortCertificationName") String sortCertificationName,
-                                  @Param("sortEndDate") String sortEndDate,
-                                  Pageable pageable);
+    Page<Employee> getEmployee(String employeeName, Long departmentId, @Param("sortEmployeeName") String sortEmployeeName,
+                               @Param("sortCertificationName") String sortCertificationName,
+                               @Param("sortEndDate") String sortEndDate,
+                               Pageable pageable);
 
 
 }

@@ -12,7 +12,6 @@ import com.luvina.la.payload.EmployeeRequest;
 import com.luvina.la.payload.EmployeeResponse;
 
 
-
 /**
  * Interface chứa các xử lý logic liên quan đến Employee
  *
@@ -45,8 +44,9 @@ public interface EmployeeService {
 
     /**
      * Khai báo phương thức xoá 1 employee theo id của employee
+     *
      * @param employeeId id của employee cần xoá
-     * @return  employeeId id của employee đã xoá thành công
+     * @return employeeId id của employee đã xoá thành công
      */
     Long deleteEmployee(Long employeeId);
 

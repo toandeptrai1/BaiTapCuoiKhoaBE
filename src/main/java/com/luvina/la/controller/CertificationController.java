@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Tạo CertificationController chứa các phương thức
  * trả về api liên quan đến certification
+ *
  * @author Toannq
  */
 @RestController
@@ -26,6 +27,7 @@ public class CertificationController {
 
     /**
      * Xử lý việc trả về api get danh sách certification
+     *
      * @return danh sách cetification
      */
     @GetMapping("")
